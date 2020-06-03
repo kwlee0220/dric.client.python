@@ -1,0 +1,13 @@
+mqtt:
+    host: localhost
+    port: 1883
+    
+video_server:
+    host: localhost
+    port: 12345
+
+dric_data:
+    host: localhost
+    port: 12345
+
+opencv_dll: C:/development/dric/dric.video/lib/opencv_java430.dll

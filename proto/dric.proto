@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "dric.proto";
+
+package dric.video;
+
+message ErrorProto {
+	string code = 1;
+	oneof optional_details {
+		string details = 2;
+	}
+}
+
+
+/////////////////////////////////////////////////////////////////
+// Basic request & response protos
+/////////////////////////////////////////////////////////////////
+message VoidProto { }
+message VoidResponse {
+	oneof either {
+		VoidProto void = 1;
+		ErrorProto error = 2;
+	}
+}
+
+message ImageCoordinateProto {
+	int32 x = 1;
+	int32 y = 2;
+}
+message CoordinateProto {
+	double x = 1;
+	double y = 2;
+}
+message BoundingBoxProto {
+	ImageCoordinateProto tl = 1;
+	ImageCoordinateProto br = 2;
+}
+
+message CameraFrameProto {
+	string camera_id = 1;		// 영상을 취득한 카메라 식별자
+	bytes image = 2;			// 영상 데이터
+	int64 ts = 3;				// 이미지 취득 시각
+}
+
+message ObjectBBoxTrackProto {
+	string camera_id = 1;		// 영상을 취득한 카메라 식별자
+	string luid = 2;			// 인지된 객체의 식별자
+	BoundingBoxProto bbox = 3;	// 인지된 객체의 영상 내 영역
+	float heading = 4;			// 인지된 객체의 방향
+	int64 ts = 5;				// 이미지 취득 시각
+}
+
+message RotationProto {
+	double yaw = 1;
+	double pitch = 2;
+	double roll = 3;
+}
+
+message ObjectTrackProto {
+	string camera_id = 1;			// 영상을 취득한 카메라 식별자
+	string luid = 2;				// 인지된 객체의 식별자
+	CoordinateProto lonlat = 3;		// 위경도 좌표계
+	double azimuth = 4;				// 방위각
+	int64 ts = 5;					// 이미지 취득 시각
+}
+
+service DrICVideoServer {
+	rpc getCameraFrame(CameraFrameRequest) returns (CameraFrameResponse);
+	rpc queryCameraFrames(CameraFrameRangeRequest) returns (stream CameraFrameResponse);
+}
+
+message CameraFrameRequest {
+	string camera_id = 1;
+	int64 ts = 2;
+}
+
+message CameraFrameResponse {
+	oneof either {
+		CameraFrameProto frame = 1;
+		ErrorProto error = 2;
+	}
+}
+
+message CameraFrameRangeRequest {
+	string camera_id = 1;				// target camera id
+	int64 start_ts = 2;					// timestamp of the start frame
+	int64 stop_ts = 3;					// timestamp of the last frame
+}
