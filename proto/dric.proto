@@ -3,7 +3,10 @@ syntax = "proto3";
 option java_multiple_files = true;
 option java_package = "dric.proto";
 
-package dric.video;
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+
+package dric;
 
 message ErrorProto {
 	string code = 1;
@@ -16,13 +19,68 @@ message ErrorProto {
 /////////////////////////////////////////////////////////////////
 // Basic request & response protos
 /////////////////////////////////////////////////////////////////
-message VoidProto { }
-message VoidResponse {
+//message VoidProto { }
+message EmptyResponse {
 	oneof either {
-		VoidProto void = 1;
+		google.protobuf.Empty void = 1;
 		ErrorProto error = 2;
 	}
 }
+
+message EndPoint {
+	string host = 1;
+	int32 port = 2;
+}
+
+message JdbcEndPoint {
+	string system = 1;
+	string host = 2;
+	int32 port = 3;
+	string db_name = 4;
+	string user = 5;
+	string password = 6;
+}
+
+
+/////////////////////////////////////////////////////////////////
+// DrIC Platform request & response protos
+/////////////////////////////////////////////////////////////////
+
+service DrICPlatform {
+	rpc getServiceEndPoint(google.protobuf.StringValue) returns (EndPoint);
+}
+
+
+
+/////////////////////////////////////////////////////////////////
+// DrIC DataStore request & response protos
+/////////////////////////////////////////////////////////////////
+
+service DrICDataStore {
+}
+
+
+
+/////////////////////////////////////////////////////////////////
+// DrIC VideoServer request & response protos
+/////////////////////////////////////////////////////////////////
+
+service DrICVideoServer {
+	rpc addCamera(CameraInfo) returns (google.protobuf.Empty);
+	rpc removeCamera(google.protobuf.StringValue) returns (google.protobuf.Empty);
+	rpc getCamera(google.protobuf.StringValue) returns (CameraInfo);
+	rpc getCameraAll(google.protobuf.Empty) returns (stream CameraInfo);
+	
+	rpc getCameraFrame(CameraFrameRequest) returns (CameraFrameResponse);
+	rpc queryCameraFrames(CameraFrameRangeRequest) returns (stream CameraFrameResponse);
+}
+
+message CameraInfo {
+	string id = 1;
+	string rtsp_url = 2;
+}
+
+
 
 message ImageCoordinateProto {
 	int32 x = 1;
@@ -63,11 +121,6 @@ message ObjectTrackProto {
 	CoordinateProto lonlat = 3;		// 위경도 좌표계
 	double azimuth = 4;				// 방위각
 	int64 ts = 5;					// 이미지 취득 시각
-}
-
-service DrICVideoServer {
-	rpc getCameraFrame(CameraFrameRequest) returns (CameraFrameResponse);
-	rpc queryCameraFrames(CameraFrameRangeRequest) returns (stream CameraFrameResponse);
 }
 
 message CameraFrameRequest {
