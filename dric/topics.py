@@ -1,5 +1,5 @@
-import dric_pb2
-from .types import *
+#import .dric_pb2
+#from .types import *
 
 class MqttTopic:
     def __init__(self, client, msg_type, topic):

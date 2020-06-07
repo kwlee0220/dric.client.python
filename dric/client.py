@@ -3,7 +3,7 @@ import yaml
 import paho.mqtt.client as mqtt
 from .topics import MqttTopic
 import grpc
-import dric_pb2_grpc
+from . import dric_pb2_grpc
 #from dric.types import *
 import google.protobuf.wrappers_pb2 as pb_builtin
     
