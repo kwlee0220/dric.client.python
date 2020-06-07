@@ -6,7 +6,9 @@ import grpc
 from . import dric_pb2_grpc
 #from dric.types import *
 import google.protobuf.wrappers_pb2 as pb_builtin
-    
+
+__version__ = "1.0.6"
+
 class DrICClient:
     def __init__(self, host, port):
         self.platform = DrICPlatform(host, port)
