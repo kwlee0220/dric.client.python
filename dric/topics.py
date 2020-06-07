@@ -1,10 +1,9 @@
-#import paho.mqtt.client as mqtt
-from . import dric_pb2
+import dric_pb2
 from .types import *
 
 class MqttTopic:
     def __init__(self, client, msg_type, topic):
-        self.mqtt_client = client.connect_mqtt()
+        self.mqtt_client = client
         self.msg_type = msg_type
         self.topic = topic
 

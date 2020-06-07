@@ -1,5 +1,5 @@
 
-from . import dric_pb2
+import dric_pb2
 
 class ImageCoordinate:
     def __init__(self, x, y):
