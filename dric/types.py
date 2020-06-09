@@ -29,14 +29,12 @@ class CameraFrame:
         self.image = image
         self.ts = ts
 
-    @classmethod
-    def from_proto(self, proto):
-        return CameraFrame(proto.camera_id, proto.image, proto.ts)
+    def from_proto(proto):
+        return CameraFrame(camera_id=proto.camera_id, image=proto.image, ts=proto.ts)
     def to_proto(self):
         return dric_pb2.CameraFrameProto(camera_id=self.camera_id, image=self.image, ts=self.ts)
 
-    @classmethod
-    def from_bytes(self, bytes):
+    def from_bytes(bytes):
         proto = dric_pb2.CameraFrameProto()
         proto.ParseFromString(bytes)
         return CameraFrame.from_proto(proto)

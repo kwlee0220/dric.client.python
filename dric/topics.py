@@ -1,11 +1,9 @@
-#import .dric_pb2
-#from .types import *
 
 class MqttTopic:
-    def __init__(self, client, msg_type, topic):
+    def __init__(self, client, topic, msg_handler=None):
         self.mqtt_client = client
-        self.msg_type = msg_type
         self.topic = topic
+        self.msg_handler = msg_handler
 
     def publish(self, msg, qos=0, retain=False):
         self.mqtt_client.publish(self.topic, msg.to_bytes(), qos, retain)
@@ -21,4 +19,7 @@ class MqttTopic:
         self.mqtt_client.unsubscribe(self.topic)
 
     def __on_message(self, client, data, msg):
-        self.on_message(self.msg_type.from_bytes(msg.payload))
+        if self.msg_handler:
+            self.on_message(self.msg_handler.from_bytes(msg.payload))
+        else:
+            self.on_message(msg.payload)
