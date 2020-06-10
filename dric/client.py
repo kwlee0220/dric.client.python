@@ -6,11 +6,15 @@ import grpc
 from . import dric_pb2_grpc
 from dric.types import CameraFrame, ObjectBBoxTrack
 from .topics import MqttTopic
+import logging
 
 __platform = None
 __service_end_points = {}
 __builtin_topic_infos = {"dric/camera_frames": CameraFrame,
                         "dric/bbox_tracks": ObjectBBoxTrack }
+_logger = logging.getLogger("dric")
+_logger.setLevel(logging.WARN)
+_logger.addHandler(logging.StreamHandler())
 
 class DrICPlatformNotConnected(Exception): pass
 class TopicNotFound(Exception):
@@ -19,6 +23,9 @@ class TopicNotFound(Exception):
 def connect(host='localhost', port=10703):
     global __platform
     __platform = DrICPlatform(host, port)
+
+def set_log_level(level):
+    _logger.setLevel(level)
 
 def get_service_point(id):
     ep = __service_end_points.get(id, None)
@@ -45,12 +52,15 @@ class DrICPlatform:
     def __init__(self, host, port):
         self.target = '{host}:{port}'.format(host=host, port=port)
     def with_stub(self, action):
+        _logger.debug('connecting DrICPlatform({0})'.format(self.target))
         with grpc.insecure_channel(self.target) as channel:
             stub = dric_pb2_grpc.DrICPlatformStub(channel)
             return action(stub)
     def get_service_end_point(self, name):
         svc_name = pb_builtin.StringValue(value=name)
-        return self.with_stub(lambda stub: stub.getServiceEndPoint(svc_name))
+        ep = self.with_stub(lambda stub: stub.getServiceEndPoint(svc_name))
+        _logger.debug('fetch: EndPoint[{0}] = {1}:{2}'.format(name,ep.host,ep.port))
+        return ep
 
 if __name__ == '__main__':
     pass
