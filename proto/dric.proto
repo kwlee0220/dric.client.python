@@ -104,9 +104,10 @@ message CameraFrameProto {
 message ObjectBBoxTrackProto {
 	string camera_id = 1;		// 영상을 취득한 카메라 식별자
 	string luid = 2;			// 인지된 객체의 식별자
-	BoundingBoxProto bbox = 3;	// 인지된 객체의 영상 내 영역
-	float heading = 4;			// 인지된 객체의 방향
-	int64 ts = 5;				// 이미지 취득 시각
+	string object_class = 3;	// 인지된 객체의 종류
+	BoundingBoxProto bbox = 4;	// 인지된 객체의 영상 내 영역
+	float heading = 5;			// 인지된 객체의 방향
+	int64 ts = 6;				// 이미지 취득 시각
 }
 
 message RotationProto {
