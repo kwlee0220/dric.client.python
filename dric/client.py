@@ -1,8 +1,8 @@
 
 import yaml
 import paho.mqtt.client as mqtt
-import google.protobuf.wrappers_pb2 as pb_builtin
 import grpc
+from . import base_pb2
 from . import dric_pb2_grpc
 from dric.types import CameraFrame, ObjectBBoxTrack
 from .topics import MqttTopic
@@ -57,10 +57,15 @@ class DrICPlatform:
             stub = dric_pb2_grpc.DrICPlatformStub(channel)
             return action(stub)
     def get_service_end_point(self, name):
-        svc_name = pb_builtin.StringValue(value=name)
-        ep = self.with_stub(lambda stub: stub.getServiceEndPoint(svc_name))
-        _logger.debug('fetch: EndPoint[{0}] = {1}:{2}'.format(name,ep.host,ep.port))
-        return ep
+        svc_name = base_pb2.StringProto(value=name)
+        ep_resp = self.with_stub(lambda stub: stub.getServiceEndPoint(svc_name))
+        case = ep_resp.WhichOneof('either')
+        if case == 'error':
+            raise ep_resp.error
+        else:
+            ep = ep_resp.end_point
+            _logger.debug('fetch: EndPoint[{0}] = {1}:{2}'.format(name,ep.host,ep.port))
+            return ep
 
 if __name__ == '__main__':
     pass

@@ -3,33 +3,24 @@ syntax = "proto3";
 option java_multiple_files = true;
 option java_package = "dric.proto";
 
-import "google/protobuf/empty.proto";
-import "google/protobuf/wrappers.proto";
+import public "base.proto";
 
 package dric;
-
-message ErrorProto {
-	string code = 1;
-	oneof optional_details {
-		string details = 2;
-	}
-}
 
 
 /////////////////////////////////////////////////////////////////
 // Basic request & response protos
 /////////////////////////////////////////////////////////////////
-//message VoidProto { }
-message EmptyResponse {
-	oneof either {
-		google.protobuf.Empty void = 1;
-		ErrorProto error = 2;
-	}
-}
 
 message EndPoint {
 	string host = 1;
 	int32 port = 2;
+}
+message EndPointResponse {
+	oneof either {
+		EndPoint end_point = 1;
+		proto.ErrorProto error = 2;
+	}
 }
 
 message JdbcEndPoint {
@@ -47,7 +38,7 @@ message JdbcEndPoint {
 /////////////////////////////////////////////////////////////////
 
 service DrICPlatform {
-	rpc getServiceEndPoint(google.protobuf.StringValue) returns (EndPoint);
+	rpc getServiceEndPoint(proto.StringProto) returns (EndPointResponse);
 }
 
 
@@ -66,10 +57,10 @@ service DrICDataStore {
 /////////////////////////////////////////////////////////////////
 
 service DrICVideoServer {
-	rpc addCamera(CameraInfo) returns (google.protobuf.Empty);
-	rpc removeCamera(google.protobuf.StringValue) returns (google.protobuf.Empty);
-	rpc getCamera(google.protobuf.StringValue) returns (CameraInfo);
-	rpc getCameraAll(google.protobuf.Empty) returns (stream CameraInfo);
+	rpc addCamera(CameraInfo) returns (proto.VoidResponse);
+	rpc removeCamera(proto.StringProto) returns (proto.VoidResponse);
+	rpc getCamera(proto.StringProto) returns (CameraInfo);
+	rpc getCameraAll(proto.VoidProto) returns (stream CameraInfo);
 	
 	rpc getCameraFrame(CameraFrameRequest) returns (CameraFrameResponse);
 	rpc queryCameraFrames(CameraFrameRangeRequest) returns (stream CameraFrameResponse);
@@ -110,18 +101,19 @@ message ObjectBBoxTrackProto {
 	int64 ts = 6;				// 이미지 취득 시각
 }
 
+message ObjectTrackProto {
+	string camera_id = 1;		// 영상을 취득한 카메라 식별자
+	string luid = 2;			// 인지된 객체의 식별자
+	string object_class = 3;	// 인지된 객체의 종류
+	CoordinateProto coordinate = 4;	// 위경도 좌표계
+	float azimuth = 5;			// 방위각
+	int64 ts = 6;				// 이미지 취득 시각
+}
+
 message RotationProto {
 	double yaw = 1;
 	double pitch = 2;
 	double roll = 3;
-}
-
-message ObjectTrackProto {
-	string camera_id = 1;			// 영상을 취득한 카메라 식별자
-	string luid = 2;				// 인지된 객체의 식별자
-	CoordinateProto lonlat = 3;		// 위경도 좌표계
-	double azimuth = 4;				// 방위각
-	int64 ts = 5;					// 이미지 취득 시각
 }
 
 message CameraFrameRequest {
@@ -132,7 +124,7 @@ message CameraFrameRequest {
 message CameraFrameResponse {
 	oneof either {
 		CameraFrameProto frame = 1;
-		ErrorProto error = 2;
+		proto.ErrorProto error = 2;
 	}
 }
 
