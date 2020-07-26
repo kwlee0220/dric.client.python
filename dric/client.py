@@ -2,8 +2,8 @@
 import yaml
 import paho.mqtt.client as mqtt
 import grpc
-from . import base_pb2
-from . import dric_pb2_grpc
+import base_pb2
+import dric_pb2_grpc
 from dric.types import CameraFrame, ObjectBBoxTrack
 from .topics import MqttTopic
 import logging
