@@ -15,7 +15,6 @@ setup(
         'grpcio'
     ],
     packages = find_packages(),
-    data_files=['marmot_dataset_pb2.py'],
     python_requires = '>=3',
     zip_safe = False
 )

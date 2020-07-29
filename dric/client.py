@@ -1,7 +1,7 @@
 import grpc
-import marmot_type_pb2 as type_pb
-import marmot_dataset_pb2_grpc as dataset_grpc
-import dric_pb2_grpc as dric_grpc
+from . import marmot_type_pb2 as type_pb
+from . import marmot_dataset_pb2_grpc as dataset_grpc
+from . import dric_pb2_grpc as dric_grpc
 from .dric_types import *
 
 __platform = None

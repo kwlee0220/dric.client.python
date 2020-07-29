@@ -1,10 +1,10 @@
 
+import logging
 import grpc
 import paho.mqtt.client as mqtt
-import marmot_type_pb2 as type_pb
-import marmot_dataset_pb2 as dataset_pb
-import marmot_dataset_pb2_grpc as dataset_grpc
-import logging
+from . import marmot_type_pb2 as type_pb
+from . import marmot_dataset_pb2 as dataset_pb
+from . import marmot_dataset_pb2_grpc as dataset_grpc
 from .types import Envelope, Coordinate, RecordSchema, Record
 from .proto_utils import handle_pb_error, from_value_proto, handle_string_response
 from .client import dataset_server_stub

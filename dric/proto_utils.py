@@ -1,5 +1,5 @@
 import grpc
-import marmot_type_pb2 as type_pb
+from . import marmot_type_pb2 as type_pb
 
 def get_either(proto, case_value):
     if getattr(proto, "has_%s" % case_value):

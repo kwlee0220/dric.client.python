@@ -11,9 +11,9 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
-import marmot_type_pb2 as marmot__type__pb2
+from . import marmot_type_pb2 as marmot__type__pb2
 
-from marmot_type_pb2 import *
+from .marmot_type_pb2 import *
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='dric.proto',
