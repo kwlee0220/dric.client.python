@@ -26,8 +26,10 @@ def connect(host='localhost', port=10703):
     __dataset_server_stub = dataset_grpc.DataSetServiceStub(__channel)
 
 def disconnect():
+    global __channel
     if __channel:
         __channel.close()
+        __channel = None
 
 def marmot_channel():
     if __channel:

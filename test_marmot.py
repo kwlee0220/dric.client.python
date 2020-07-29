@@ -1,8 +1,8 @@
-import marmot
+import dric
 
-marmot.connect('localhost', 15685)
+dric.connect()
 
-ds = marmot.get_dataset('교통/철도/링크')
+ds = dric.get_dataset('교통/철도/링크')
 print(ds)
 print(ds.record_count)
 print(ds.bounds)
@@ -18,4 +18,4 @@ print(ds.bounds)
 for rec in ds.read():
     print(rec[0].length, rec[1:])
 
-marmot.disconnect()
+dric.disconnect()
