@@ -19,7 +19,7 @@ class DrICPlatformStub(object):
             channel: A grpc.Channel.
         """
         self.getServiceEndPoint = channel.unary_unary(
-                '/dric.DrICPlatform/getServiceEndPoint',
+                '/dric.proto.DrICPlatform/getServiceEndPoint',
                 request_serializer=marmot__type__pb2.StringProto.SerializeToString,
                 response_deserializer=dric__pb2.EndPointResponse.FromString,
                 )
@@ -48,7 +48,7 @@ def add_DrICPlatformServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'dric.DrICPlatform', rpc_method_handlers)
+            'dric.proto.DrICPlatform', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
@@ -70,7 +70,7 @@ class DrICPlatform(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/dric.DrICPlatform/getServiceEndPoint',
+        return grpc.experimental.unary_unary(request, target, '/dric.proto.DrICPlatform/getServiceEndPoint',
             marmot__type__pb2.StringProto.SerializeToString,
             dric__pb2.EndPointResponse.FromString,
             options, channel_credentials,
@@ -104,7 +104,7 @@ def add_DrICDataStoreServicer_to_server(servicer, server):
     rpc_method_handlers = {
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'dric.DrICDataStore', rpc_method_handlers)
+            'dric.proto.DrICDataStore', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
@@ -131,32 +131,32 @@ class DrICVideoServerStub(object):
             channel: A grpc.Channel.
         """
         self.addCamera = channel.unary_unary(
-                '/dric.DrICVideoServer/addCamera',
+                '/dric.proto.DrICVideoServer/addCamera',
                 request_serializer=dric__pb2.CameraInfoProto.SerializeToString,
                 response_deserializer=marmot__type__pb2.VoidResponse.FromString,
                 )
         self.removeCamera = channel.unary_unary(
-                '/dric.DrICVideoServer/removeCamera',
+                '/dric.proto.DrICVideoServer/removeCamera',
                 request_serializer=marmot__type__pb2.StringProto.SerializeToString,
                 response_deserializer=marmot__type__pb2.VoidResponse.FromString,
                 )
         self.getCamera = channel.unary_unary(
-                '/dric.DrICVideoServer/getCamera',
+                '/dric.proto.DrICVideoServer/getCamera',
                 request_serializer=marmot__type__pb2.StringProto.SerializeToString,
                 response_deserializer=dric__pb2.CameraInfoResponse.FromString,
                 )
         self.getCameraAll = channel.unary_stream(
-                '/dric.DrICVideoServer/getCameraAll',
+                '/dric.proto.DrICVideoServer/getCameraAll',
                 request_serializer=marmot__type__pb2.VoidProto.SerializeToString,
                 response_deserializer=dric__pb2.CameraInfoResponse.FromString,
                 )
         self.getCameraFrame = channel.unary_unary(
-                '/dric.DrICVideoServer/getCameraFrame',
+                '/dric.proto.DrICVideoServer/getCameraFrame',
                 request_serializer=dric__pb2.CameraFrameRequest.SerializeToString,
                 response_deserializer=dric__pb2.CameraFrameResponse.FromString,
                 )
         self.queryCameraFrames = channel.unary_stream(
-                '/dric.DrICVideoServer/queryCameraFrames',
+                '/dric.proto.DrICVideoServer/queryCameraFrames',
                 request_serializer=dric__pb2.CameraFrameRangeRequest.SerializeToString,
                 response_deserializer=dric__pb2.CameraFrameResponse.FromString,
                 )
@@ -240,7 +240,7 @@ def add_DrICVideoServerServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'dric.DrICVideoServer', rpc_method_handlers)
+            'dric.proto.DrICVideoServer', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
@@ -262,7 +262,7 @@ class DrICVideoServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/dric.DrICVideoServer/addCamera',
+        return grpc.experimental.unary_unary(request, target, '/dric.proto.DrICVideoServer/addCamera',
             dric__pb2.CameraInfoProto.SerializeToString,
             marmot__type__pb2.VoidResponse.FromString,
             options, channel_credentials,
@@ -278,7 +278,7 @@ class DrICVideoServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/dric.DrICVideoServer/removeCamera',
+        return grpc.experimental.unary_unary(request, target, '/dric.proto.DrICVideoServer/removeCamera',
             marmot__type__pb2.StringProto.SerializeToString,
             marmot__type__pb2.VoidResponse.FromString,
             options, channel_credentials,
@@ -294,7 +294,7 @@ class DrICVideoServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/dric.DrICVideoServer/getCamera',
+        return grpc.experimental.unary_unary(request, target, '/dric.proto.DrICVideoServer/getCamera',
             marmot__type__pb2.StringProto.SerializeToString,
             dric__pb2.CameraInfoResponse.FromString,
             options, channel_credentials,
@@ -310,7 +310,7 @@ class DrICVideoServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/dric.DrICVideoServer/getCameraAll',
+        return grpc.experimental.unary_stream(request, target, '/dric.proto.DrICVideoServer/getCameraAll',
             marmot__type__pb2.VoidProto.SerializeToString,
             dric__pb2.CameraInfoResponse.FromString,
             options, channel_credentials,
@@ -326,7 +326,7 @@ class DrICVideoServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/dric.DrICVideoServer/getCameraFrame',
+        return grpc.experimental.unary_unary(request, target, '/dric.proto.DrICVideoServer/getCameraFrame',
             dric__pb2.CameraFrameRequest.SerializeToString,
             dric__pb2.CameraFrameResponse.FromString,
             options, channel_credentials,
@@ -342,7 +342,7 @@ class DrICVideoServer(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(request, target, '/dric.DrICVideoServer/queryCameraFrames',
+        return grpc.experimental.unary_stream(request, target, '/dric.proto.DrICVideoServer/queryCameraFrames',
             dric__pb2.CameraFrameRangeRequest.SerializeToString,
             dric__pb2.CameraFrameResponse.FromString,
             options, channel_credentials,

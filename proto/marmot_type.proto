@@ -1,0 +1,180 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "marmot.proto";
+
+package marmot.proto;
+
+enum TypeCodeProto {
+	NULL = 0;
+	BYTE = 1;
+	SHORT = 2;
+	INT = 3;
+	LONG = 4;
+	FLOAT = 5;
+	DOUBLE = 6;
+	BOOLEAN = 7;
+	STRING = 8;
+	BINARY = 9;
+	
+	DATE = 10;
+	TIME = 11;
+	DATETIME = 12;
+	
+	COORDINATE = 13;
+	ENVELOPE = 14;
+	POINT = 15;
+	MULTI_POINT = 16;
+	LINESTRING = 17;
+	MULTI_LINESTRING = 18;
+	POLYGON = 19;
+	MULTI_POLYGON = 20;
+	GEOM_COLLECTION = 21;
+	GEOMETRY = 22;
+	
+	LIST = 23;
+	RECORd = 24;
+}
+
+message ErrorProto {
+	enum Code {
+		INVALID_ARGUMENT = 0;
+		INVALID_STATE = 1;
+		NOT_FOUND = 2;
+		ALREADY_EXISTS = 3;
+		CANCELLED = 4;
+		TIMEOUT = 5;
+		IO_ERROR = 6;
+		GRPC_STATUS = 98;
+		INTERNAL = 99;
+	}
+	
+	Code code = 1;
+	string details = 2;
+}
+
+message VoidProto { }
+message VoidResponse {
+	oneof either {
+		VoidProto value = 1;
+		ErrorProto error = 2;
+	}
+}
+
+message Int32Proto { int32 value = 1; }
+message Int32Response {
+	oneof either {
+		int32 value = 1;
+		ErrorProto error = 2;
+	}
+}
+
+message Int64Proto { int64 value = 1; }
+message Int64Response {
+	oneof either {
+		int64 value = 1;
+		ErrorProto error = 2;
+	}
+}
+
+message StringProto { string value = 1; }
+message StringResponse {
+	oneof either {
+		StringProto value = 1;
+		ErrorProto error = 2;
+	}
+}
+
+message BoolProto { bool value = 1; }
+message BoolResponse {
+	oneof either {
+		BoolProto value = 1;
+		ErrorProto error = 2;
+	}
+}
+
+message CoordinateProto {
+	double x = 1;
+	double y = 2;
+}
+message EnvelopeProto {
+	CoordinateProto tl = 1;
+	CoordinateProto br = 2;
+}
+
+message GeometryProto {
+	oneof either {
+		bytes wkb = 1;						// 공간정보는 WKB를 사용한다. (POINT 예외)
+		CoordinateProto point = 2;			// POINT 정보
+		TypeCodeProto empty_geom_tc = 3;	// Geometry가 empty인 경우.
+	}
+}
+
+message ValueProto {
+	oneof value {
+		int32 byte_value = 1; 
+		int32 short_value = 2; 
+		int32 int_value = 3; 
+		int64 long_value = 4; 
+		float float_value = 5; 
+		double double_value = 6; 
+		bool bool_value = 7; 
+		string string_value = 8; 
+		bytes binary_value = 9;
+		
+		uint64 date_value = 10; 			// epcho time
+		string time_value = 11; 			// ISO-8601 format 문자열
+		uint64 datetime_value = 12; 		// epcho time
+		
+		CoordinateProto coordinate_value = 13;
+		EnvelopeProto envelope_value = 14; 
+		GeometryProto geometry_value = 15;
+		TypeCodeProto null_value = 51;		// null value에 해당하는 typecode 값
+	}
+}
+message ValueResponse {
+	oneof either {
+		ValueProto value = 1;
+		proto.ErrorProto error = 2;
+	}
+}
+
+message RecordSchemaResponse {
+	oneof either {
+		string record_schema = 1;
+		proto.ErrorProto error = 2;
+	}
+}
+message RecordProto {
+	repeated ValueProto column = 1;
+}
+message RecordResponse {
+	oneof either {
+		RecordProto record = 1;
+		proto.ErrorProto error = 2;
+	}
+}
+message RecordSetProto {
+	repeated RecordProto record = 1;
+}
+
+message UpMessage {
+	oneof either {	
+		bytes header = 1;
+		bytes block = 2;
+		ErrorProto error = 3;
+		VoidProto eos = 4;
+		VoidProto dummy = 5;
+		uint64 offset = 6;
+	}
+}
+message DownMessage {
+	oneof either {
+		bytes result = 1;
+		bytes block = 2;
+		ErrorProto error = 3;
+		VoidProto eos = 4;
+		VoidProto dummy = 5;
+		uint64 offset = 6;
+	}
+}

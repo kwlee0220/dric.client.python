@@ -5,7 +5,7 @@ option java_package = "dric.proto";
 
 import public "marmot_type.proto";
 
-package dric;
+package dric.proto;
 
 
 /////////////////////////////////////////////////////////////////

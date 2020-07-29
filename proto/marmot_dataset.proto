@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "marmot.dataset.proto";
+
+package marmot.dataset.proto;
+
+import public "marmot_type.proto";
+
+
+service DataSetService {
+	rpc createDataSet(CreateDataSetRequest) returns (DataSetInfoResponse);
+	rpc deleteDataSet(marmot.proto.StringProto) returns (marmot.proto.BoolResponse);
+
+	rpc readDataSet(stream marmot.proto.UpMessage) returns (stream marmot.proto.DownMessage);
+	rpc readDataSet2(marmot.proto.StringProto) returns (stream marmot.proto.RecordResponse);
+	rpc writeDataSet(stream marmot.proto.UpMessage) returns (stream marmot.proto.DownMessage);
+	rpc moveDataSet(MoveDataSetRequest) returns (DataSetInfoResponse);
+	
+	rpc getDataSetInfo(marmot.proto.StringProto) returns (DataSetInfoResponse);
+	rpc getDataSetInfoAll(marmot.proto.VoidProto) returns (stream DataSetInfoResponse);
+	rpc getDataSetInfoAllInDir(DirectoryTraverseRequest) returns (stream DataSetInfoResponse);
+	rpc updateDataSetInfo(DataSetInfoProto) returns (DataSetInfoResponse);
+	
+	//
+	// DataSet Directory related interface
+	//
+	rpc getDirAll(marmot.proto.VoidProto) returns (stream marmot.proto.StringResponse);
+	rpc getSubDirAll(DirectoryTraverseRequest) returns (stream marmot.proto.StringResponse);
+	rpc getParentDir(marmot.proto.StringProto) returns (marmot.proto.StringResponse);
+	rpc moveDir(MoveDirRequest) returns (marmot.proto.VoidResponse);
+	rpc deleteDir(marmot.proto.StringProto) returns (marmot.proto.VoidResponse);
+}
+
+enum DataSetTypeProto {
+	AVRO = 0;
+	MQTT = 1;
+}	
+
+message DataSetInfoProto {
+	string id = 1;							// 데이터세트 식별자
+	string record_schema = 2; 				// 데이터세트 컬럼 정보
+	DataSetTypeProto type = 3;				// 데이터세트 타입
+	uint64 count = 4;						// 데이터세트에 포함된 레코드 갯수
+	oneof optional_bounds {
+		marmot.proto.EnvelopeProto bounds = 5;	// 데이터세트 MBR (default geometry column이 정의된 경우)
+	}
+	string parameter = 6;					// 데이터세트 저장 경로
+}
+
+message DataSetInfoResponse {
+	oneof either {
+		DataSetInfoProto dataset_info = 1;
+		marmot.proto.ErrorProto error = 2;
+	}
+}
+
+message CreateDataSetRequest {
+	string id = 1;					// 생성하고자 하는 데이터세트의 식별자.
+	string type = 2;
+	string record_schema = 3;		// 생성하고자 하는 데이터세트의 스키마.
+	string parameter = 4;
+	bool force = 5;
+}
+
+message MoveDataSetRequest {
+	string src_id = 1;
+	string dest_id = 2;
+}
+
+message MoveDirRequest {
+	string src_path = 1;
+	string dest_path = 2;
+}
+
+message DirectoryTraverseRequest {
+	string directory = 1;	// 검색 대상 시작 디렉토리 경로
+	bool recursive = 2;		// 하위 디렉토리 검색 여부.
+}

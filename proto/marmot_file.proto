@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "proto.file";
+
+package proto.file;
+
+import public "marmot_type.proto";
+
+
+service FileService {
+	rpc readHdfsFile(stream marmot.proto.UpMessage) returns (stream marmot.proto.DownMessage);
+	rpc writeHdfsFile(stream marmot.proto.UpMessage) returns (stream marmot.proto.DownMessage);
+	rpc deleteHdfsFile(marmot.proto.StringProto) returns (marmot.proto.BoolResponse);
+	
+	rpc walkRegularFileTree(marmot.proto.StringProto) returns (stream marmot.proto.StringProto);
+}
+
+message WriteHdfsFileRequest {
+	marmot.proto.StringProto path = 1;	// 업로드될 데이터를 저장할 HDFS 파일 경로
+	oneof optional_block_size {
+		int64 block_size = 2;			// 생성될 HDFS 파일의 블럭 크기. (기본값: 128mb)
+	}
+}

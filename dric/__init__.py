@@ -1,6 +1,6 @@
-from .client import connect, set_log_level
-# from .topics import *
-# from .types import *
+from .client import connect, get_topic, set_log_level
+from .types import RecordSchema, Record, RecordSchemaBuilder
+from .dric_types import CameraFrame, ObjectBBoxTrack
 # from .data_types import *
 # from .record import *
 # from .dataset import *

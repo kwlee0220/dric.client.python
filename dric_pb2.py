@@ -17,10 +17,10 @@ from marmot_type_pb2 import *
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='dric.proto',
-  package='dric',
+  package='dric.proto',
   syntax='proto3',
   serialized_options=b'\n\ndric.protoP\001',
-  serialized_pb=b'\n\ndric.proto\x12\x04\x64ric\x1a\x11marmot_type.proto\"&\n\x08\x45ndPoint\x12\x0c\n\x04host\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\"l\n\x10\x45ndPointResponse\x12#\n\tend_point\x18\x01 \x01(\x0b\x32\x0e.dric.EndPointH\x00\x12)\n\x05\x65rror\x18\x02 \x01(\x0b\x32\x18.marmot.proto.ErrorProtoH\x00\x42\x08\n\x06\x65ither\"k\n\x0cJdbcEndPoint\x12\x0e\n\x06system\x18\x01 \x01(\t\x12\x0c\n\x04host\x18\x02 \x01(\t\x12\x0c\n\x04port\x18\x03 \x01(\x05\x12\x0f\n\x07\x64\x62_name\x18\x04 \x01(\t\x12\x0c\n\x04user\x18\x05 \x01(\t\x12\x10\n\x08password\x18\x06 \x01(\t\"/\n\x0f\x43\x61meraInfoProto\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08rtsp_url\x18\x02 \x01(\t\"r\n\x12\x43\x61meraInfoResponse\x12\'\n\x06\x63\x61mera\x18\x01 \x01(\x0b\x32\x15.dric.CameraInfoProtoH\x00\x12)\n\x05\x65rror\x18\x02 \x01(\x0b\x32\x18.marmot.proto.ErrorProtoH\x00\x42\x08\n\x06\x65ither\",\n\x14ImageCoordinateProto\x12\t\n\x01x\x18\x01 \x01(\x05\x12\t\n\x01y\x18\x02 \x01(\x05\"b\n\x10\x42oundingBoxProto\x12&\n\x02tl\x18\x01 \x01(\x0b\x32\x1a.dric.ImageCoordinateProto\x12&\n\x02\x62r\x18\x02 \x01(\x0b\x32\x1a.dric.ImageCoordinateProto\"@\n\x10\x43\x61meraFrameProto\x12\x11\n\tcamera_id\x18\x01 \x01(\t\x12\r\n\x05image\x18\x02 \x01(\x0c\x12\n\n\x02ts\x18\x03 \x01(\x03\"s\n\x13\x43\x61meraFrameResponse\x12\'\n\x05\x66rame\x18\x01 \x01(\x0b\x32\x16.dric.CameraFrameProtoH\x00\x12)\n\x05\x65rror\x18\x02 \x01(\x0b\x32\x18.marmot.proto.ErrorProtoH\x00\x42\x08\n\x06\x65ither\"3\n\x12\x43\x61meraFrameRequest\x12\x11\n\tcamera_id\x18\x01 \x01(\t\x12\n\n\x02ts\x18\x02 \x01(\x03\"O\n\x17\x43\x61meraFrameRangeRequest\x12\x11\n\tcamera_id\x18\x01 \x01(\t\x12\x10\n\x08start_ts\x18\x02 \x01(\x03\x12\x0f\n\x07stop_ts\x18\x03 \x01(\x03\"\x90\x01\n\x14ObjectBBoxTrackProto\x12\x11\n\tcamera_id\x18\x01 \x01(\t\x12\x0c\n\x04luid\x18\x02 \x01(\t\x12\x14\n\x0cobject_class\x18\x03 \x01(\t\x12$\n\x04\x62\x62ox\x18\x04 \x01(\x0b\x32\x16.dric.BoundingBoxProto\x12\x0f\n\x07heading\x18\x05 \x01(\x02\x12\n\n\x02ts\x18\x06 \x01(\x03\"\x99\x01\n\x10ObjectTrackProto\x12\x11\n\tcamera_id\x18\x01 \x01(\t\x12\x0c\n\x04luid\x18\x02 \x01(\t\x12\x14\n\x0cobject_class\x18\x03 \x01(\t\x12\x31\n\ncoordinate\x18\x04 \x01(\x0b\x32\x1d.marmot.proto.CoordinateProto\x12\x0f\n\x07\x61zimuth\x18\x05 \x01(\x02\x12\n\n\x02ts\x18\x06 \x01(\x03\"9\n\rRotationProto\x12\x0b\n\x03yaw\x18\x01 \x01(\x01\x12\r\n\x05pitch\x18\x02 \x01(\x01\x12\x0c\n\x04roll\x18\x03 \x01(\x01\x32W\n\x0c\x44rICPlatform\x12G\n\x12getServiceEndPoint\x12\x19.marmot.proto.StringProto\x1a\x16.dric.EndPointResponse2\x0f\n\rDrICDataStore2\xb7\x03\n\x0f\x44rICVideoServer\x12>\n\taddCamera\x12\x15.dric.CameraInfoProto\x1a\x1a.marmot.proto.VoidResponse\x12\x45\n\x0cremoveCamera\x12\x19.marmot.proto.StringProto\x1a\x1a.marmot.proto.VoidResponse\x12@\n\tgetCamera\x12\x19.marmot.proto.StringProto\x1a\x18.dric.CameraInfoResponse\x12\x43\n\x0cgetCameraAll\x12\x17.marmot.proto.VoidProto\x1a\x18.dric.CameraInfoResponse0\x01\x12\x45\n\x0egetCameraFrame\x12\x18.dric.CameraFrameRequest\x1a\x19.dric.CameraFrameResponse\x12O\n\x11queryCameraFrames\x12\x1d.dric.CameraFrameRangeRequest\x1a\x19.dric.CameraFrameResponse0\x01\x42\x0e\n\ndric.protoP\x01P\x00\x62\x06proto3'
+  serialized_pb=b'\n\ndric.proto\x12\ndric.proto\x1a\x11marmot_type.proto\"&\n\x08\x45ndPoint\x12\x0c\n\x04host\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\"r\n\x10\x45ndPointResponse\x12)\n\tend_point\x18\x01 \x01(\x0b\x32\x14.dric.proto.EndPointH\x00\x12)\n\x05\x65rror\x18\x02 \x01(\x0b\x32\x18.marmot.proto.ErrorProtoH\x00\x42\x08\n\x06\x65ither\"k\n\x0cJdbcEndPoint\x12\x0e\n\x06system\x18\x01 \x01(\t\x12\x0c\n\x04host\x18\x02 \x01(\t\x12\x0c\n\x04port\x18\x03 \x01(\x05\x12\x0f\n\x07\x64\x62_name\x18\x04 \x01(\t\x12\x0c\n\x04user\x18\x05 \x01(\t\x12\x10\n\x08password\x18\x06 \x01(\t\"/\n\x0f\x43\x61meraInfoProto\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08rtsp_url\x18\x02 \x01(\t\"x\n\x12\x43\x61meraInfoResponse\x12-\n\x06\x63\x61mera\x18\x01 \x01(\x0b\x32\x1b.dric.proto.CameraInfoProtoH\x00\x12)\n\x05\x65rror\x18\x02 \x01(\x0b\x32\x18.marmot.proto.ErrorProtoH\x00\x42\x08\n\x06\x65ither\",\n\x14ImageCoordinateProto\x12\t\n\x01x\x18\x01 \x01(\x05\x12\t\n\x01y\x18\x02 \x01(\x05\"n\n\x10\x42oundingBoxProto\x12,\n\x02tl\x18\x01 \x01(\x0b\x32 .dric.proto.ImageCoordinateProto\x12,\n\x02\x62r\x18\x02 \x01(\x0b\x32 .dric.proto.ImageCoordinateProto\"@\n\x10\x43\x61meraFrameProto\x12\x11\n\tcamera_id\x18\x01 \x01(\t\x12\r\n\x05image\x18\x02 \x01(\x0c\x12\n\n\x02ts\x18\x03 \x01(\x03\"y\n\x13\x43\x61meraFrameResponse\x12-\n\x05\x66rame\x18\x01 \x01(\x0b\x32\x1c.dric.proto.CameraFrameProtoH\x00\x12)\n\x05\x65rror\x18\x02 \x01(\x0b\x32\x18.marmot.proto.ErrorProtoH\x00\x42\x08\n\x06\x65ither\"3\n\x12\x43\x61meraFrameRequest\x12\x11\n\tcamera_id\x18\x01 \x01(\t\x12\n\n\x02ts\x18\x02 \x01(\x03\"O\n\x17\x43\x61meraFrameRangeRequest\x12\x11\n\tcamera_id\x18\x01 \x01(\t\x12\x10\n\x08start_ts\x18\x02 \x01(\x03\x12\x0f\n\x07stop_ts\x18\x03 \x01(\x03\"\x96\x01\n\x14ObjectBBoxTrackProto\x12\x11\n\tcamera_id\x18\x01 \x01(\t\x12\x0c\n\x04luid\x18\x02 \x01(\t\x12\x14\n\x0cobject_class\x18\x03 \x01(\t\x12*\n\x04\x62\x62ox\x18\x04 \x01(\x0b\x32\x1c.dric.proto.BoundingBoxProto\x12\x0f\n\x07heading\x18\x05 \x01(\x02\x12\n\n\x02ts\x18\x06 \x01(\x03\"\x99\x01\n\x10ObjectTrackProto\x12\x11\n\tcamera_id\x18\x01 \x01(\t\x12\x0c\n\x04luid\x18\x02 \x01(\t\x12\x14\n\x0cobject_class\x18\x03 \x01(\t\x12\x31\n\ncoordinate\x18\x04 \x01(\x0b\x32\x1d.marmot.proto.CoordinateProto\x12\x0f\n\x07\x61zimuth\x18\x05 \x01(\x02\x12\n\n\x02ts\x18\x06 \x01(\x03\"9\n\rRotationProto\x12\x0b\n\x03yaw\x18\x01 \x01(\x01\x12\r\n\x05pitch\x18\x02 \x01(\x01\x12\x0c\n\x04roll\x18\x03 \x01(\x01\x32]\n\x0c\x44rICPlatform\x12M\n\x12getServiceEndPoint\x12\x19.marmot.proto.StringProto\x1a\x1c.dric.proto.EndPointResponse2\x0f\n\rDrICDataStore2\xe1\x03\n\x0f\x44rICVideoServer\x12\x44\n\taddCamera\x12\x1b.dric.proto.CameraInfoProto\x1a\x1a.marmot.proto.VoidResponse\x12\x45\n\x0cremoveCamera\x12\x19.marmot.proto.StringProto\x1a\x1a.marmot.proto.VoidResponse\x12\x46\n\tgetCamera\x12\x19.marmot.proto.StringProto\x1a\x1e.dric.proto.CameraInfoResponse\x12I\n\x0cgetCameraAll\x12\x17.marmot.proto.VoidProto\x1a\x1e.dric.proto.CameraInfoResponse0\x01\x12Q\n\x0egetCameraFrame\x12\x1e.dric.proto.CameraFrameRequest\x1a\x1f.dric.proto.CameraFrameResponse\x12[\n\x11queryCameraFrames\x12#.dric.proto.CameraFrameRangeRequest\x1a\x1f.dric.proto.CameraFrameResponse0\x01\x42\x0e\n\ndric.protoP\x01P\x00\x62\x06proto3'
   ,
   dependencies=[marmot__type__pb2.DESCRIPTOR,],
   public_dependencies=[marmot__type__pb2.DESCRIPTOR,])
@@ -30,20 +30,20 @@ DESCRIPTOR = _descriptor.FileDescriptor(
 
 _ENDPOINT = _descriptor.Descriptor(
   name='EndPoint',
-  full_name='dric.EndPoint',
+  full_name='dric.proto.EndPoint',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='host', full_name='dric.EndPoint.host', index=0,
+      name='host', full_name='dric.proto.EndPoint.host', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='port', full_name='dric.EndPoint.port', index=1,
+      name='port', full_name='dric.proto.EndPoint.port', index=1,
       number=2, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -61,27 +61,27 @@ _ENDPOINT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=39,
-  serialized_end=77,
+  serialized_start=45,
+  serialized_end=83,
 )
 
 
 _ENDPOINTRESPONSE = _descriptor.Descriptor(
   name='EndPointResponse',
-  full_name='dric.EndPointResponse',
+  full_name='dric.proto.EndPointResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='end_point', full_name='dric.EndPointResponse.end_point', index=0,
+      name='end_point', full_name='dric.proto.EndPointResponse.end_point', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='error', full_name='dric.EndPointResponse.error', index=1,
+      name='error', full_name='dric.proto.EndPointResponse.error', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -99,58 +99,58 @@ _ENDPOINTRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
     _descriptor.OneofDescriptor(
-      name='either', full_name='dric.EndPointResponse.either',
+      name='either', full_name='dric.proto.EndPointResponse.either',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=79,
-  serialized_end=187,
+  serialized_start=85,
+  serialized_end=199,
 )
 
 
 _JDBCENDPOINT = _descriptor.Descriptor(
   name='JdbcEndPoint',
-  full_name='dric.JdbcEndPoint',
+  full_name='dric.proto.JdbcEndPoint',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='system', full_name='dric.JdbcEndPoint.system', index=0,
+      name='system', full_name='dric.proto.JdbcEndPoint.system', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='host', full_name='dric.JdbcEndPoint.host', index=1,
+      name='host', full_name='dric.proto.JdbcEndPoint.host', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='port', full_name='dric.JdbcEndPoint.port', index=2,
+      name='port', full_name='dric.proto.JdbcEndPoint.port', index=2,
       number=3, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='db_name', full_name='dric.JdbcEndPoint.db_name', index=3,
+      name='db_name', full_name='dric.proto.JdbcEndPoint.db_name', index=3,
       number=4, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='user', full_name='dric.JdbcEndPoint.user', index=4,
+      name='user', full_name='dric.proto.JdbcEndPoint.user', index=4,
       number=5, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='password', full_name='dric.JdbcEndPoint.password', index=5,
+      name='password', full_name='dric.proto.JdbcEndPoint.password', index=5,
       number=6, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -168,27 +168,27 @@ _JDBCENDPOINT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=189,
-  serialized_end=296,
+  serialized_start=201,
+  serialized_end=308,
 )
 
 
 _CAMERAINFOPROTO = _descriptor.Descriptor(
   name='CameraInfoProto',
-  full_name='dric.CameraInfoProto',
+  full_name='dric.proto.CameraInfoProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='id', full_name='dric.CameraInfoProto.id', index=0,
+      name='id', full_name='dric.proto.CameraInfoProto.id', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='rtsp_url', full_name='dric.CameraInfoProto.rtsp_url', index=1,
+      name='rtsp_url', full_name='dric.proto.CameraInfoProto.rtsp_url', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -206,27 +206,27 @@ _CAMERAINFOPROTO = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=298,
-  serialized_end=345,
+  serialized_start=310,
+  serialized_end=357,
 )
 
 
 _CAMERAINFORESPONSE = _descriptor.Descriptor(
   name='CameraInfoResponse',
-  full_name='dric.CameraInfoResponse',
+  full_name='dric.proto.CameraInfoResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='camera', full_name='dric.CameraInfoResponse.camera', index=0,
+      name='camera', full_name='dric.proto.CameraInfoResponse.camera', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='error', full_name='dric.CameraInfoResponse.error', index=1,
+      name='error', full_name='dric.proto.CameraInfoResponse.error', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -244,30 +244,30 @@ _CAMERAINFORESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
     _descriptor.OneofDescriptor(
-      name='either', full_name='dric.CameraInfoResponse.either',
+      name='either', full_name='dric.proto.CameraInfoResponse.either',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=347,
-  serialized_end=461,
+  serialized_start=359,
+  serialized_end=479,
 )
 
 
 _IMAGECOORDINATEPROTO = _descriptor.Descriptor(
   name='ImageCoordinateProto',
-  full_name='dric.ImageCoordinateProto',
+  full_name='dric.proto.ImageCoordinateProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='x', full_name='dric.ImageCoordinateProto.x', index=0,
+      name='x', full_name='dric.proto.ImageCoordinateProto.x', index=0,
       number=1, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='y', full_name='dric.ImageCoordinateProto.y', index=1,
+      name='y', full_name='dric.proto.ImageCoordinateProto.y', index=1,
       number=2, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -285,27 +285,27 @@ _IMAGECOORDINATEPROTO = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=463,
-  serialized_end=507,
+  serialized_start=481,
+  serialized_end=525,
 )
 
 
 _BOUNDINGBOXPROTO = _descriptor.Descriptor(
   name='BoundingBoxProto',
-  full_name='dric.BoundingBoxProto',
+  full_name='dric.proto.BoundingBoxProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='tl', full_name='dric.BoundingBoxProto.tl', index=0,
+      name='tl', full_name='dric.proto.BoundingBoxProto.tl', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='br', full_name='dric.BoundingBoxProto.br', index=1,
+      name='br', full_name='dric.proto.BoundingBoxProto.br', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -323,34 +323,34 @@ _BOUNDINGBOXPROTO = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=509,
-  serialized_end=607,
+  serialized_start=527,
+  serialized_end=637,
 )
 
 
 _CAMERAFRAMEPROTO = _descriptor.Descriptor(
   name='CameraFrameProto',
-  full_name='dric.CameraFrameProto',
+  full_name='dric.proto.CameraFrameProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='camera_id', full_name='dric.CameraFrameProto.camera_id', index=0,
+      name='camera_id', full_name='dric.proto.CameraFrameProto.camera_id', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='image', full_name='dric.CameraFrameProto.image', index=1,
+      name='image', full_name='dric.proto.CameraFrameProto.image', index=1,
       number=2, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value=b"",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='ts', full_name='dric.CameraFrameProto.ts', index=2,
+      name='ts', full_name='dric.proto.CameraFrameProto.ts', index=2,
       number=3, type=3, cpp_type=2, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -368,27 +368,27 @@ _CAMERAFRAMEPROTO = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=609,
-  serialized_end=673,
+  serialized_start=639,
+  serialized_end=703,
 )
 
 
 _CAMERAFRAMERESPONSE = _descriptor.Descriptor(
   name='CameraFrameResponse',
-  full_name='dric.CameraFrameResponse',
+  full_name='dric.proto.CameraFrameResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='frame', full_name='dric.CameraFrameResponse.frame', index=0,
+      name='frame', full_name='dric.proto.CameraFrameResponse.frame', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='error', full_name='dric.CameraFrameResponse.error', index=1,
+      name='error', full_name='dric.proto.CameraFrameResponse.error', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -406,30 +406,30 @@ _CAMERAFRAMERESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
     _descriptor.OneofDescriptor(
-      name='either', full_name='dric.CameraFrameResponse.either',
+      name='either', full_name='dric.proto.CameraFrameResponse.either',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=675,
-  serialized_end=790,
+  serialized_start=705,
+  serialized_end=826,
 )
 
 
 _CAMERAFRAMEREQUEST = _descriptor.Descriptor(
   name='CameraFrameRequest',
-  full_name='dric.CameraFrameRequest',
+  full_name='dric.proto.CameraFrameRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='camera_id', full_name='dric.CameraFrameRequest.camera_id', index=0,
+      name='camera_id', full_name='dric.proto.CameraFrameRequest.camera_id', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='ts', full_name='dric.CameraFrameRequest.ts', index=1,
+      name='ts', full_name='dric.proto.CameraFrameRequest.ts', index=1,
       number=2, type=3, cpp_type=2, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -447,34 +447,34 @@ _CAMERAFRAMEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=792,
-  serialized_end=843,
+  serialized_start=828,
+  serialized_end=879,
 )
 
 
 _CAMERAFRAMERANGEREQUEST = _descriptor.Descriptor(
   name='CameraFrameRangeRequest',
-  full_name='dric.CameraFrameRangeRequest',
+  full_name='dric.proto.CameraFrameRangeRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='camera_id', full_name='dric.CameraFrameRangeRequest.camera_id', index=0,
+      name='camera_id', full_name='dric.proto.CameraFrameRangeRequest.camera_id', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='start_ts', full_name='dric.CameraFrameRangeRequest.start_ts', index=1,
+      name='start_ts', full_name='dric.proto.CameraFrameRangeRequest.start_ts', index=1,
       number=2, type=3, cpp_type=2, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='stop_ts', full_name='dric.CameraFrameRangeRequest.stop_ts', index=2,
+      name='stop_ts', full_name='dric.proto.CameraFrameRangeRequest.stop_ts', index=2,
       number=3, type=3, cpp_type=2, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -492,55 +492,55 @@ _CAMERAFRAMERANGEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=845,
-  serialized_end=924,
+  serialized_start=881,
+  serialized_end=960,
 )
 
 
 _OBJECTBBOXTRACKPROTO = _descriptor.Descriptor(
   name='ObjectBBoxTrackProto',
-  full_name='dric.ObjectBBoxTrackProto',
+  full_name='dric.proto.ObjectBBoxTrackProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='camera_id', full_name='dric.ObjectBBoxTrackProto.camera_id', index=0,
+      name='camera_id', full_name='dric.proto.ObjectBBoxTrackProto.camera_id', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='luid', full_name='dric.ObjectBBoxTrackProto.luid', index=1,
+      name='luid', full_name='dric.proto.ObjectBBoxTrackProto.luid', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='object_class', full_name='dric.ObjectBBoxTrackProto.object_class', index=2,
+      name='object_class', full_name='dric.proto.ObjectBBoxTrackProto.object_class', index=2,
       number=3, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='bbox', full_name='dric.ObjectBBoxTrackProto.bbox', index=3,
+      name='bbox', full_name='dric.proto.ObjectBBoxTrackProto.bbox', index=3,
       number=4, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='heading', full_name='dric.ObjectBBoxTrackProto.heading', index=4,
+      name='heading', full_name='dric.proto.ObjectBBoxTrackProto.heading', index=4,
       number=5, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='ts', full_name='dric.ObjectBBoxTrackProto.ts', index=5,
+      name='ts', full_name='dric.proto.ObjectBBoxTrackProto.ts', index=5,
       number=6, type=3, cpp_type=2, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -558,55 +558,55 @@ _OBJECTBBOXTRACKPROTO = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=927,
-  serialized_end=1071,
+  serialized_start=963,
+  serialized_end=1113,
 )
 
 
 _OBJECTTRACKPROTO = _descriptor.Descriptor(
   name='ObjectTrackProto',
-  full_name='dric.ObjectTrackProto',
+  full_name='dric.proto.ObjectTrackProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='camera_id', full_name='dric.ObjectTrackProto.camera_id', index=0,
+      name='camera_id', full_name='dric.proto.ObjectTrackProto.camera_id', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='luid', full_name='dric.ObjectTrackProto.luid', index=1,
+      name='luid', full_name='dric.proto.ObjectTrackProto.luid', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='object_class', full_name='dric.ObjectTrackProto.object_class', index=2,
+      name='object_class', full_name='dric.proto.ObjectTrackProto.object_class', index=2,
       number=3, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='coordinate', full_name='dric.ObjectTrackProto.coordinate', index=3,
+      name='coordinate', full_name='dric.proto.ObjectTrackProto.coordinate', index=3,
       number=4, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='azimuth', full_name='dric.ObjectTrackProto.azimuth', index=4,
+      name='azimuth', full_name='dric.proto.ObjectTrackProto.azimuth', index=4,
       number=5, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='ts', full_name='dric.ObjectTrackProto.ts', index=5,
+      name='ts', full_name='dric.proto.ObjectTrackProto.ts', index=5,
       number=6, type=3, cpp_type=2, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -624,34 +624,34 @@ _OBJECTTRACKPROTO = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1074,
-  serialized_end=1227,
+  serialized_start=1116,
+  serialized_end=1269,
 )
 
 
 _ROTATIONPROTO = _descriptor.Descriptor(
   name='RotationProto',
-  full_name='dric.RotationProto',
+  full_name='dric.proto.RotationProto',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='yaw', full_name='dric.RotationProto.yaw', index=0,
+      name='yaw', full_name='dric.proto.RotationProto.yaw', index=0,
       number=1, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='pitch', full_name='dric.RotationProto.pitch', index=1,
+      name='pitch', full_name='dric.proto.RotationProto.pitch', index=1,
       number=2, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='roll', full_name='dric.RotationProto.roll', index=2,
+      name='roll', full_name='dric.proto.RotationProto.roll', index=2,
       number=3, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
@@ -669,8 +669,8 @@ _ROTATIONPROTO = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1229,
-  serialized_end=1286,
+  serialized_start=1271,
+  serialized_end=1328,
 )
 
 _ENDPOINTRESPONSE.fields_by_name['end_point'].message_type = _ENDPOINT
@@ -720,98 +720,98 @@ _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 EndPoint = _reflection.GeneratedProtocolMessageType('EndPoint', (_message.Message,), {
   'DESCRIPTOR' : _ENDPOINT,
   '__module__' : 'dric_pb2'
-  # @@protoc_insertion_point(class_scope:dric.EndPoint)
+  # @@protoc_insertion_point(class_scope:dric.proto.EndPoint)
   })
 _sym_db.RegisterMessage(EndPoint)
 
 EndPointResponse = _reflection.GeneratedProtocolMessageType('EndPointResponse', (_message.Message,), {
   'DESCRIPTOR' : _ENDPOINTRESPONSE,
   '__module__' : 'dric_pb2'
-  # @@protoc_insertion_point(class_scope:dric.EndPointResponse)
+  # @@protoc_insertion_point(class_scope:dric.proto.EndPointResponse)
   })
 _sym_db.RegisterMessage(EndPointResponse)
 
 JdbcEndPoint = _reflection.GeneratedProtocolMessageType('JdbcEndPoint', (_message.Message,), {
   'DESCRIPTOR' : _JDBCENDPOINT,
   '__module__' : 'dric_pb2'
-  # @@protoc_insertion_point(class_scope:dric.JdbcEndPoint)
+  # @@protoc_insertion_point(class_scope:dric.proto.JdbcEndPoint)
   })
 _sym_db.RegisterMessage(JdbcEndPoint)
 
 CameraInfoProto = _reflection.GeneratedProtocolMessageType('CameraInfoProto', (_message.Message,), {
   'DESCRIPTOR' : _CAMERAINFOPROTO,
   '__module__' : 'dric_pb2'
-  # @@protoc_insertion_point(class_scope:dric.CameraInfoProto)
+  # @@protoc_insertion_point(class_scope:dric.proto.CameraInfoProto)
   })
 _sym_db.RegisterMessage(CameraInfoProto)
 
 CameraInfoResponse = _reflection.GeneratedProtocolMessageType('CameraInfoResponse', (_message.Message,), {
   'DESCRIPTOR' : _CAMERAINFORESPONSE,
   '__module__' : 'dric_pb2'
-  # @@protoc_insertion_point(class_scope:dric.CameraInfoResponse)
+  # @@protoc_insertion_point(class_scope:dric.proto.CameraInfoResponse)
   })
 _sym_db.RegisterMessage(CameraInfoResponse)
 
 ImageCoordinateProto = _reflection.GeneratedProtocolMessageType('ImageCoordinateProto', (_message.Message,), {
   'DESCRIPTOR' : _IMAGECOORDINATEPROTO,
   '__module__' : 'dric_pb2'
-  # @@protoc_insertion_point(class_scope:dric.ImageCoordinateProto)
+  # @@protoc_insertion_point(class_scope:dric.proto.ImageCoordinateProto)
   })
 _sym_db.RegisterMessage(ImageCoordinateProto)
 
 BoundingBoxProto = _reflection.GeneratedProtocolMessageType('BoundingBoxProto', (_message.Message,), {
   'DESCRIPTOR' : _BOUNDINGBOXPROTO,
   '__module__' : 'dric_pb2'
-  # @@protoc_insertion_point(class_scope:dric.BoundingBoxProto)
+  # @@protoc_insertion_point(class_scope:dric.proto.BoundingBoxProto)
   })
 _sym_db.RegisterMessage(BoundingBoxProto)
 
 CameraFrameProto = _reflection.GeneratedProtocolMessageType('CameraFrameProto', (_message.Message,), {
   'DESCRIPTOR' : _CAMERAFRAMEPROTO,
   '__module__' : 'dric_pb2'
-  # @@protoc_insertion_point(class_scope:dric.CameraFrameProto)
+  # @@protoc_insertion_point(class_scope:dric.proto.CameraFrameProto)
   })
 _sym_db.RegisterMessage(CameraFrameProto)
 
 CameraFrameResponse = _reflection.GeneratedProtocolMessageType('CameraFrameResponse', (_message.Message,), {
   'DESCRIPTOR' : _CAMERAFRAMERESPONSE,
   '__module__' : 'dric_pb2'
-  # @@protoc_insertion_point(class_scope:dric.CameraFrameResponse)
+  # @@protoc_insertion_point(class_scope:dric.proto.CameraFrameResponse)
   })
 _sym_db.RegisterMessage(CameraFrameResponse)
 
 CameraFrameRequest = _reflection.GeneratedProtocolMessageType('CameraFrameRequest', (_message.Message,), {
   'DESCRIPTOR' : _CAMERAFRAMEREQUEST,
   '__module__' : 'dric_pb2'
-  # @@protoc_insertion_point(class_scope:dric.CameraFrameRequest)
+  # @@protoc_insertion_point(class_scope:dric.proto.CameraFrameRequest)
   })
 _sym_db.RegisterMessage(CameraFrameRequest)
 
 CameraFrameRangeRequest = _reflection.GeneratedProtocolMessageType('CameraFrameRangeRequest', (_message.Message,), {
   'DESCRIPTOR' : _CAMERAFRAMERANGEREQUEST,
   '__module__' : 'dric_pb2'
-  # @@protoc_insertion_point(class_scope:dric.CameraFrameRangeRequest)
+  # @@protoc_insertion_point(class_scope:dric.proto.CameraFrameRangeRequest)
   })
 _sym_db.RegisterMessage(CameraFrameRangeRequest)
 
 ObjectBBoxTrackProto = _reflection.GeneratedProtocolMessageType('ObjectBBoxTrackProto', (_message.Message,), {
   'DESCRIPTOR' : _OBJECTBBOXTRACKPROTO,
   '__module__' : 'dric_pb2'
-  # @@protoc_insertion_point(class_scope:dric.ObjectBBoxTrackProto)
+  # @@protoc_insertion_point(class_scope:dric.proto.ObjectBBoxTrackProto)
   })
 _sym_db.RegisterMessage(ObjectBBoxTrackProto)
 
 ObjectTrackProto = _reflection.GeneratedProtocolMessageType('ObjectTrackProto', (_message.Message,), {
   'DESCRIPTOR' : _OBJECTTRACKPROTO,
   '__module__' : 'dric_pb2'
-  # @@protoc_insertion_point(class_scope:dric.ObjectTrackProto)
+  # @@protoc_insertion_point(class_scope:dric.proto.ObjectTrackProto)
   })
 _sym_db.RegisterMessage(ObjectTrackProto)
 
 RotationProto = _reflection.GeneratedProtocolMessageType('RotationProto', (_message.Message,), {
   'DESCRIPTOR' : _ROTATIONPROTO,
   '__module__' : 'dric_pb2'
-  # @@protoc_insertion_point(class_scope:dric.RotationProto)
+  # @@protoc_insertion_point(class_scope:dric.proto.RotationProto)
   })
 _sym_db.RegisterMessage(RotationProto)
 
@@ -820,16 +820,16 @@ DESCRIPTOR._options = None
 
 _DRICPLATFORM = _descriptor.ServiceDescriptor(
   name='DrICPlatform',
-  full_name='dric.DrICPlatform',
+  full_name='dric.proto.DrICPlatform',
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=1288,
-  serialized_end=1375,
+  serialized_start=1330,
+  serialized_end=1423,
   methods=[
   _descriptor.MethodDescriptor(
     name='getServiceEndPoint',
-    full_name='dric.DrICPlatform.getServiceEndPoint',
+    full_name='dric.proto.DrICPlatform.getServiceEndPoint',
     index=0,
     containing_service=None,
     input_type=marmot__type__pb2._STRINGPROTO,
@@ -844,12 +844,12 @@ DESCRIPTOR.services_by_name['DrICPlatform'] = _DRICPLATFORM
 
 _DRICDATASTORE = _descriptor.ServiceDescriptor(
   name='DrICDataStore',
-  full_name='dric.DrICDataStore',
+  full_name='dric.proto.DrICDataStore',
   file=DESCRIPTOR,
   index=1,
   serialized_options=None,
-  serialized_start=1377,
-  serialized_end=1392,
+  serialized_start=1425,
+  serialized_end=1440,
   methods=[
 ])
 _sym_db.RegisterServiceDescriptor(_DRICDATASTORE)
@@ -859,16 +859,16 @@ DESCRIPTOR.services_by_name['DrICDataStore'] = _DRICDATASTORE
 
 _DRICVIDEOSERVER = _descriptor.ServiceDescriptor(
   name='DrICVideoServer',
-  full_name='dric.DrICVideoServer',
+  full_name='dric.proto.DrICVideoServer',
   file=DESCRIPTOR,
   index=2,
   serialized_options=None,
-  serialized_start=1395,
-  serialized_end=1834,
+  serialized_start=1443,
+  serialized_end=1924,
   methods=[
   _descriptor.MethodDescriptor(
     name='addCamera',
-    full_name='dric.DrICVideoServer.addCamera',
+    full_name='dric.proto.DrICVideoServer.addCamera',
     index=0,
     containing_service=None,
     input_type=_CAMERAINFOPROTO,
@@ -877,7 +877,7 @@ _DRICVIDEOSERVER = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='removeCamera',
-    full_name='dric.DrICVideoServer.removeCamera',
+    full_name='dric.proto.DrICVideoServer.removeCamera',
     index=1,
     containing_service=None,
     input_type=marmot__type__pb2._STRINGPROTO,
@@ -886,7 +886,7 @@ _DRICVIDEOSERVER = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='getCamera',
-    full_name='dric.DrICVideoServer.getCamera',
+    full_name='dric.proto.DrICVideoServer.getCamera',
     index=2,
     containing_service=None,
     input_type=marmot__type__pb2._STRINGPROTO,
@@ -895,7 +895,7 @@ _DRICVIDEOSERVER = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='getCameraAll',
-    full_name='dric.DrICVideoServer.getCameraAll',
+    full_name='dric.proto.DrICVideoServer.getCameraAll',
     index=3,
     containing_service=None,
     input_type=marmot__type__pb2._VOIDPROTO,
@@ -904,7 +904,7 @@ _DRICVIDEOSERVER = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='getCameraFrame',
-    full_name='dric.DrICVideoServer.getCameraFrame',
+    full_name='dric.proto.DrICVideoServer.getCameraFrame',
     index=4,
     containing_service=None,
     input_type=_CAMERAFRAMEREQUEST,
@@ -913,7 +913,7 @@ _DRICVIDEOSERVER = _descriptor.ServiceDescriptor(
   ),
   _descriptor.MethodDescriptor(
     name='queryCameraFrames',
-    full_name='dric.DrICVideoServer.queryCameraFrames',
+    full_name='dric.proto.DrICVideoServer.queryCameraFrames',
     index=5,
     containing_service=None,
     input_type=_CAMERAFRAMERANGEREQUEST,

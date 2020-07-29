@@ -9,9 +9,11 @@ from grpc_tools import protoc
 protoc.main((
     '',
     '-Iproto',
-    '-I../../marmot/marmot.client.python/proto',
     '--python_out=.',
     '--grpc_python_out=.',
+    'proto/marmot_type.proto',
+    'proto/marmot_dataset.proto',
+    'proto/marmot_file.proto',
     'proto/dric.proto',
 ))
 
