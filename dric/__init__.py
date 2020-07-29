@@ -5,4 +5,4 @@ from .dric_types import CameraFrame, ObjectBBoxTrack
 # from .record import *
 from .dataset import *
 
-__version__ = "1.0.9"
+__version__ = "1.1.0"
