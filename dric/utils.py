@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+from collections import namedtuple
 
 def from_bstring_to_mat(bstr):
     nparr = np.frombuffer(bstr, dtype='uint8')

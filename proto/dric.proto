@@ -57,29 +57,35 @@ service DrICDataStore {
 /////////////////////////////////////////////////////////////////
 
 service DrICVideoServer {
-	rpc addCamera(CameraInfoProto) returns (marmot.proto.VoidResponse);
+	rpc addCamera(CameraInfo) returns (marmot.proto.VoidResponse);
 	rpc removeCamera(marmot.proto.StringProto) returns (marmot.proto.VoidResponse);
 	rpc getCamera(marmot.proto.StringProto) returns (CameraInfoResponse);
 	rpc getCameraAll(marmot.proto.VoidProto) returns (stream CameraInfoResponse);
 	
-	rpc getCameraFrame(CameraFrameRequest) returns (CameraFrameResponse);
-	rpc queryCameraFrames(CameraFrameRangeRequest) returns (stream CameraFrameResponse);
+//	rpc getCameraFrame(CameraFrameRequest) returns (CameraFrameResponse);
+//	rpc queryCameraFrames(CameraFrameRangeRequest) returns (stream CameraFrameResponse);
 }
 
-message CameraInfoProto {
+message CameraInfo {
 	string id = 1;
 	string rtsp_url = 2;
 }
 message CameraInfoResponse {
 	oneof either {
-		CameraInfoProto camera = 1;
+		CameraInfo camera_info = 1;
 		marmot.proto.ErrorProto error = 2;
 	}
 }
 
+
+
 message ImageCoordinateProto {
 	int32 x = 1;
 	int32 y = 2;
+}
+message CoordinateProto {
+	double x = 1;
+	double y = 2;
 }
 message BoundingBoxProto {
 	ImageCoordinateProto tl = 1;
@@ -90,21 +96,6 @@ message CameraFrameProto {
 	string camera_id = 1;		// 영상을 취득한 카메라 식별자
 	bytes image = 2;			// 영상 데이터
 	int64 ts = 3;				// 이미지 취득 시각
-}
-message CameraFrameResponse {
-	oneof either {
-		CameraFrameProto frame = 1;
-		marmot.proto.ErrorProto error = 2;
-	}
-}
-message CameraFrameRequest {
-	string camera_id = 1;
-	int64 ts = 2;
-}
-message CameraFrameRangeRequest {
-	string camera_id = 1;				// target camera id
-	int64 start_ts = 2;					// timestamp of the start frame
-	int64 stop_ts = 3;					// timestamp of the last frame
 }
 
 message ObjectBBoxTrackProto {
@@ -120,7 +111,7 @@ message ObjectTrackProto {
 	string camera_id = 1;		// 영상을 취득한 카메라 식별자
 	string luid = 2;			// 인지된 객체의 식별자
 	string object_class = 3;	// 인지된 객체의 종류
-	marmot.proto.CoordinateProto coordinate = 4;	// 위경도 좌표계
+	CoordinateProto coordinate = 4;	// 위경도 좌표계
 	float azimuth = 5;			// 방위각
 	int64 ts = 6;				// 이미지 취득 시각
 }
@@ -129,4 +120,22 @@ message RotationProto {
 	double yaw = 1;
 	double pitch = 2;
 	double roll = 3;
+}
+
+message CameraFrameRequest {
+	string camera_id = 1;
+	int64 ts = 2;
+}
+
+message CameraFrameResponse {
+	oneof either {
+		CameraFrameProto frame = 1;
+		marmot.proto.ErrorProto error = 2;
+	}
+}
+
+message CameraFrameRangeRequest {
+	string camera_id = 1;				// target camera id
+	int64 start_ts = 2;					// timestamp of the start frame
+	int64 stop_ts = 3;					// timestamp of the last frame
 }

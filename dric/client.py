@@ -1,8 +1,9 @@
 import grpc
+import cv2
 from . import marmot_type_pb2 as type_pb
 from . import marmot_dataset_pb2_grpc as dataset_grpc
 from . import dric_pb2_grpc as dric_grpc
-from .dric_types import *
+from . import proto_utils
 
 __platform = None
 __channel = None
@@ -24,6 +25,7 @@ def connect(host='localhost', port=10703):
     __channel = grpc.insecure_channel(target)
     global __dataset_server_stub
     __dataset_server_stub = dataset_grpc.DataSetServiceStub(__channel)
+    return __platform
 
 def disconnect():
     global __channel
@@ -56,17 +58,32 @@ class DrICPlatform:
             stub = dric_grpc.DrICPlatformStub(channel)
             return action(stub)
 
+    def video_server(self):
+        ep = self.get_service_end_point('video_server')
+        return DrICVideoServer(ep.host, ep.port)
+
     def get_service_end_point(self, name):
         svc_name = type_pb.StringProto(value=name)
         resp = self.with_stub(lambda stub: stub.getServiceEndPoint(svc_name))
-        case = resp.WhichOneof('either')
-        if case == 'error':
-            raise resp.error
-        else:
-            ep = resp.end_point
-            _logger.debug('fetch: EndPoint[{0}] = {1}:{2}'.format(name,ep.host,ep.port))
-            return ep
+        ep = proto_utils.handle_response(resp, 'end_point')
+        _logger.debug('fetch: EndPoint[{0}] = {1}:{2}'.format(name, ep.host, ep.port))
+        return ep
 
+class DrICVideoServer:
+    def __init__(self, host, port):
+        self.target = '{host}:{port}'.format(host=host, port=port)
+    def with_stub(self, action):
+        _logger.debug('connecting DrICVideoServer({0})'.format(self.target))
+        with grpc.insecure_channel(self.target) as channel:
+            stub = dric_grpc.DrICVideoServerStub(channel)
+            return action(stub)
+    def get_camera(self, camera_id):
+        id_proto = type_pb.StringProto(value=camera_id)
+        resp = self.with_stub(lambda stub: stub.getCamera(id_proto))
+        camera = proto_utils.handle_response(resp, 'camera')
+        _logger.debug('fetch camera: {0}'.format(camera.rtsp_url))
+        return cv2.VideoCapture(camera.rtsp_url)
+    
 __service_end_points = {}
 def get_service_point(id):
     ep = __service_end_points.get(id, None)

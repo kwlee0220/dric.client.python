@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'dric_client',
-    version = '1.1.0',
+    version = '1.1.2',
     description = 'Python client interface to Dr.IC platform',
     author = 'Kang-Woo Lee',
     author_email = 'kwlee@etri.re.kr',

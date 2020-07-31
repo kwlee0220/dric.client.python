@@ -65,6 +65,13 @@ def handle_string_response(string_resp):
     else:
         return string_resp.value.value
 
+def handle_response(resp, field_name):
+    case = resp.WhichOneof('either')
+    if case == 'error':
+        handle_pb_error(resp.error)
+    else:
+        return getattr(resp, field_name)
+
 def from_value_proto(proto):
     case = proto.WhichOneof("value")
     if case == 'string_value':
