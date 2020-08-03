@@ -1,9 +1,9 @@
 import grpc
-from . import marmot_type_pb2 as type_pb
+from . import pb2
 
-def get_either(proto, case_value):
-    if getattr(proto, "has_%s" % case_value):
-        return getattr(proto, case_value)
+def get_either(proto, case):
+    if proto.HasField(case):
+        return getattr(proto, case)
     else:
         return None
 
@@ -37,23 +37,23 @@ class Internal(Exception):
 
 def handle_pb_error(error):
     code = error.code
-    if code == type_pb.ErrorProto.Code.NOT_FOUND:
+    if code == pb2.type.ErrorProto.Code.NOT_FOUND:
         raise NotFound(error.details)
-    elif code == type_pb.ErrorProto.Code.ALREADY_EXISTS:
+    elif code == pb2.type.ErrorProto.Code.ALREADY_EXISTS:
         raise AlreadyExists(error.details)
-    elif code == type_pb.ErrorProto.Code.INVALID_ARGUMENT:
+    elif code == pb2.type.ErrorProto.Code.INVALID_ARGUMENT:
         raise InvalidArgument(error.details)
-    elif code == type_pb.ErrorProto.Code.INVALID_STATE:
+    elif code == pb2.type.ErrorProto.Code.INVALID_STATE:
         raise InvalidState(error.details)
-    elif code == type_pb.ErrorProto.Code.CANCELLED:
+    elif code == pb2.type.ErrorProto.Code.CANCELLED:
         raise Cancelled(error.details)
-    elif code == type_pb.ErrorProto.Code.TIMEOUT:
+    elif code == pb2.type.ErrorProto.Code.TIMEOUT:
         raise Timeout(error.details)
-    elif code == type_pb.ErrorProto.Code.IO_ERROR:
+    elif code == pb2.type.ErrorProto.Code.IO_ERROR:
         raise IoError(error.details)
-    elif code == type_pb.ErrorProto.Code.GRPC_STATUS:
+    elif code == pb2.type.ErrorProto.Code.GRPC_STATUS:
         raise GrpcStatus(error.details)
-    elif code == type_pb.ErrorProto.Code.INTERNAL:
+    elif code == pb2.type.ErrorProto.Code.INTERNAL:
         raise Internal(error.details)
     else:
         raise SystemError(error.details)

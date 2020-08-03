@@ -1,86 +1,61 @@
 
 import logging
-import grpc
-import paho.mqtt.client as mqtt
-from . import marmot_type_pb2 as type_pb
-from . import marmot_dataset_pb2 as dataset_pb
-from . import marmot_dataset_pb2_grpc as dataset_grpc
+from . import pb2
 from .types import Envelope, Coordinate, RecordSchema, Record
-from .proto_utils import handle_pb_error, from_value_proto, handle_string_response
-from .client import dataset_server_stub
-
-logger = logging.getLogger('dric.dataset')
-
-def get_dataset(ds_id):
-    req = type_pb.StringProto(value=ds_id)
-    resp = dataset_server_stub().getDataSetInfo(req)
-    return handle_dataset_info(resp)
-    
-def get_dataset_all():
-    req = type_pb.VoidProto()
-    for resp in dataset_server_stub().getDataSetInfoAll(req):
-        yield handle_dataset_info(resp)
-        
-def get_dataset_all_in_dir(start, recur):
-    req = dataset_pb.DirectoryTraverseRequest(directory=start, recursive=recur)
-    for resp in dataset_server_stub().getDataSetInfoAllInDir(req):
-        yield handle_dataset_info(resp)
-
-def get_dir_all():
-    req = type_pb.VoidProto()
-    for resp in dataset_server_stub().getDirAll(req):
-        yield handle_string_response(resp)
-
-def get_sub_dir_all(start, recur):
-    req = dataset_pb.DirectoryTraverseRequest(directory=start, recursive=recur)
-    for resp in dataset_server_stub().getSubDirAll(req):
-        yield handle_string_response(resp)
-
-def read_dataset(ds_id):
-    ds = get_dataset(ds_id)
-    if ds.type == dataset_pb.MQTT:
-        raise ValueError("unsupport dataset type: %s" % ds.type)
-
-    req = type_pb.StringProto(value = ds_id)
-    return RecordStream(ds.schema, dataset_server_stub().readDataSet2(req))
+from .proto_utils import get_either, from_value_proto, handle_pb_error#, handle_string_response
 
 class DataSet:
-    def __init__(self, ds_info):
+    import logging
+    __logger = logging.getLogger("marmot.dataset")
+    __logger.setLevel(logging.WARN)
+    __logger.addHandler(logging.StreamHandler())
+
+    def __init__(self, stub, ds_info):
+        self.stub = stub
         self.ds_info = ds_info
         schema_id = ds_info.record_schema
         self.schema = RecordSchema.from_type_id(schema_id)
 
-    def __getattr__(self, name):
-        if name == 'id':
-            return self.ds_info.id
-        elif name == 'type':
-            return self.ds_info.type
-        elif name == 'record_schema':
-            return self.schema
-        elif name == 'record_count':
-            return self.ds_info.count
-        elif name == 'bounds':
-            if self.ds_info.WhichOneof('optional_bounds') == 'bounds':
-                envl = self.ds_info.bounds
-                return Envelope(Coordinate(envl.tl.x, envl.tl.y), Coordinate(envl.br.x, envl.br.y))
-            else:
-                return None
-        elif name == 'parameter':
-            return self.ds_info.parameter
+    @property
+    def id(self):
+        return self.ds_info.id
+    @property
+    def type(self):
+        return self.ds_info.type
+    @property
+    def record_schema(self):
+        return self.schema
+    @property
+    def record_count(self):
+        return self.ds_info.count
+    @property
+    def bounds(self):
+        envl = get_either(self.ds_info, 'bounds')
+        if envl:
+            return Envelope(Coordinate(envl.tl.x, envl.tl.y), Coordinate(envl.br.x, envl.br.y))
         else:
-            raise ValueError("unknown attribute: " + name)
+            return None
+    @property
+    def parameter(self):
+        return self.ds_info.parameter
 
     def read(self):
-        return read_dataset(self.ds_info.id)
+        if self.ds_info.type == pb2.dataset.MQTT:
+            raise ValueError("unsupport dataset type: %s" % self.ds_info.type)
+        req = pb2.type.StringProto(value = self.ds_info.id)
+        return RecordStream(self.schema, self.stub.readDataSet2(req))
 
     def __str__(self):
         return '%s:%d:%s' % (self.ds_info.id, self.ds_info.count, str(self.schema))
-
 
 class RecordStream:
     def __init__(self, schema, rec_iter):
         self.schema = schema
         self.rec_iter = rec_iter
+
+    @property
+    def record_schema(self):
+        return self.schema
 
     def __iter__(self):
         for rec_resp in self.rec_iter:
@@ -95,12 +70,68 @@ class RecordStream:
             values = resp.record.column
             return tuple(from_value_proto(values[col.ordinal]) for col in schema.columns)
 
-def handle_dataset_info(resp):
-    case = resp.WhichOneof('either')
-    if case == 'error':
-        handle_pb_error(resp.error)
-    else:
-        return DataSet(resp.dataset_info)
+from io import BytesIO
+from fastavro import parse_schema, schemaless_reader, schemaless_writer
+class MqttDataSet(DataSet):
+    def __init__(self, stub, ds_info):
+        super().__init__(stub, ds_info)
+        self.parsed_schema = parse_schema(self.schema.avro_schema)
+
+    def read(self):
+        parts = self.parameter.split(":")
+        import paho.mqtt.client as mqtt
+        mqtt_client = mqtt.Client()
+        mqtt_client.connect(parts[0], int(parts[1]))
+        return TopicRecordStream(self.schema, mqtt_client, parts[2])
+
+    def write(self, strm):
+        parts = self.parameter.split(":")
+        import paho.mqtt.client as mqtt
+        mqtt_client = mqtt.Client()
+        mqtt_client.connect(parts[0], int(parts[1]))
+        for rec in strm:
+            fo = BytesIO()
+            rec.
+            schemaless_writer.write(fo, self.parsed_schema)
+
+    class TopicRecordStream:
+        def __init__(self, schema, mqtt_client, topic_name):
+            self.schema = schema
+            self.parsed_schema = parse_schema(schema.avro_schema)
+
+            import threading, queue
+            self.cv = threading.Condition()
+            self.msg_queue = queue.Queue()
+
+            from .mqtt import MqttTopic
+            topic = MqttTopic(mqtt_client, topic_name)
+            topic.subscribe_async(self.on_message)
+
+        @property
+        def record_schema(self):
+            return self.schema
+
+        def __next__(self):
+            with self.cv:
+                while 1:
+                    if self.msg_queue.qsize() > 0:
+                        rec_bytes = self.msg_queue.get()
+                        return self.__parse_bytes(rec_bytes)
+                    else:
+                        self.cv.wait()
+
+        def on_message(self, bytes):
+            with self.cv:
+                if self.msg_queue.qsize() < 16:
+                    self.msg_queue.put(bytes)
+                    self.cv.notify()
+                else:
+                    print("lost message!!!!!")
+
+        def __parse_bytes(self, bytes):
+            with BytesIO(bytes) as fo:
+                grec = schemaless_reader(fo, self.parsed_schema)
+                return Record.read_generic_record(grec, self.schema)
 
 # NAME_TO_GEOMETRY_TYPES = {
 #     'POINT': POINT, 'MULTI_POINT': MULTI_POINT,

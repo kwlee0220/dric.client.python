@@ -2,7 +2,8 @@ import dric
 
 dric.connect()
 
-ds = dric.get_dataset('교통/철도/링크')
+# ds = dric.get_dataset('교통/철도/링크')
+ds = dric.get_dataset('topics/dric/camera_frames')
 print(ds)
 print(ds.record_count)
 print(ds.bounds)

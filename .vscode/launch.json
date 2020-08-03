@@ -9,6 +9,7 @@
             "type": "python",
             "request": "launch",
             "program": "${file}",
+            "args": ["cam_00", "C:/Temp/cam_1.mp4", "-s", "-l"],
             "console": "integratedTerminal"
         }
     ]

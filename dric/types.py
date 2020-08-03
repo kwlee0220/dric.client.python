@@ -290,10 +290,30 @@ class Record:
     def __str__(self):
         return '(' + ', '.join(['%s' % (self.values[col[2]]) for col in self.schema.columns]) + ')'
 
+    def to_generic_record():
+        return [write_avro_value(grec[col.name], col.type) for col in schema.columns]
+
     @staticmethod
     def read_generic_record(grec, schema):
         values = [parse_avro_value(grec[col.name], col.type) for col in schema.columns]
         return Record(schema, values)
+
+def write_avro_value(value, type):
+    if type.isPrimitiveType:
+        if type.tc == TypeClass.STRING or type.tc == TypeClass.INT or type.tc == TypeClass.DOUBLE or    \
+            type.tc == TypeClass.LONG or type.tc == TypeClass.FLOAT or type.tc == TypeClass.SHORT or \
+            type.tc == TypeClass.BOOLEAN or type.tc == TypeClass.BOOLEAN or type.tc == TypeClass.BYTE or \
+            type.tc == TypeClass.BINARY or type.tc == TypeClass.DATETIME:
+            return value
+        elif type.tc == TypeClass.COORDINATE:
+            return list(value)
+        elif type.tc == TypeClass.ENVELOPE:
+            return list(value.tl) + list(value.br)
+    elif type.isGeometryType:
+        from shapely.wkb import dumps
+        return dumps(value)
+    else:
+        pass
 
 def parse_avro_value(value, type):
     if type.isPrimitiveType:
