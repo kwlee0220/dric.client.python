@@ -1,4 +1,4 @@
-from fastavro import parse_schema, schemaless_reader
+from fastavro import parse_schema, schemaless_reader, schemaless_writer
 from io import BytesIO
 from .types import *
 
@@ -18,9 +18,21 @@ class CameraFrame(AvroSerializable):
     PARSED_AVRO_SCHEMA = parse_schema(SCHEMA.avro_schema)
 
     def __init__(self, camera_id, image, ts):
-        self.camera_id = camera_id
-        self.image = image
-        self.ts = ts
+        from .utils import to_bstring_from_mat
+        bstr = to_bstring_from_mat(image)
+        epoch = int(round(ts * 1000))
+        self.values = [camera_id, bstr, epoch]
+
+    def to_bytes(self):
+        fo = BytesIO()
+        schemaless_writer(fo, CameraFrame.PARSED_AVRO_SCHEMA, self.values)
+        fo.flush()
+        fo.close()
+        return fo.getvalue()
+
+    def __str__(self):
+        return '{0}[id={1}, image.size={2}, ts={3}'.format(type(self).__name__, self.camera_id,
+                                                            len(self.image), self.ts)
 
 class ObjectBBoxTrack:
     SCHEMA = RecordSchemaBuilder()   \

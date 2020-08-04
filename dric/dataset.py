@@ -79,10 +79,7 @@ class MqttDataSet(DataSet):
 
     def read(self):
         parts = self.parameter.split(":")
-        import paho.mqtt.client as mqtt
-        mqtt_client = mqtt.Client()
-        mqtt_client.connect(parts[0], int(parts[1]))
-        return TopicRecordStream(self.schema, mqtt_client, parts[2])
+        return TopicRecordStream(self.schema, parts[0], int(parts[1]), parts[2])
 
     def write(self, strm):
         parts = self.parameter.split(":")
@@ -91,48 +88,50 @@ class MqttDataSet(DataSet):
         mqtt_client.connect(parts[0], int(parts[1]))
         for rec in strm:
             fo = BytesIO()
-            rec.
-            schemaless_writer.write(fo, self.parsed_schema)
+            schemaless_writer.write(fo, self.parsed_schema, rec)
 
-    class TopicRecordStream:
-        def __init__(self, schema, mqtt_client, topic_name):
-            self.schema = schema
-            self.parsed_schema = parse_schema(schema.avro_schema)
+class TopicRecordStream:
+    def __init__(self, schema, broker_host, broker_port, topic_name):
+        self.schema = schema
+        self.parsed_schema = parse_schema(schema.avro_schema)
 
-            import threading, queue
-            self.cv = threading.Condition()
-            self.msg_queue = queue.Queue()
+        import threading, queue
+        self.cv = threading.Condition()
+        self.msg_queue = queue.Queue()
 
-            from .mqtt import MqttTopic
-            topic = MqttTopic(mqtt_client, topic_name)
-            topic.subscribe_async(self.on_message)
+        import paho.mqtt.client as mqtt
+        from .mqtt import MqttTopic
+        topic = MqttTopic(broker_host, broker_port, topic_name)
+        topic.subscribe_async(self.on_message)
 
-        @property
-        def record_schema(self):
-            return self.schema
+    def __iter__(self):
+        return self
 
-        def __next__(self):
-            with self.cv:
-                while 1:
-                    if self.msg_queue.qsize() > 0:
-                        rec_bytes = self.msg_queue.get()
-                        return self.__parse_bytes(rec_bytes)
-                    else:
-                        self.cv.wait()
+    @property
+    def record_schema(self):
+        return self.schema
 
-        def on_message(self, bytes):
-            with self.cv:
-                if self.msg_queue.qsize() < 16:
-                    self.msg_queue.put(bytes)
-                    self.cv.notify()
+    def __next__(self):
+        with self.cv:
+            while 1:
+                if self.msg_queue.qsize() > 0:
+                    rec_bytes = self.msg_queue.get()
+                    return self.__parse_bytes(rec_bytes)
                 else:
-                    print("lost message!!!!!")
+                    self.cv.wait()
 
-        def __parse_bytes(self, bytes):
-            with BytesIO(bytes) as fo:
-                grec = schemaless_reader(fo, self.parsed_schema)
-                return Record.read_generic_record(grec, self.schema)
+    def on_message(self, bytes):
+        with self.cv:
+            if self.msg_queue.qsize() < 16:
+                self.msg_queue.put(bytes)
+                self.cv.notify()
+            else:
+                print("lost message!!!!!")
 
+    def __parse_bytes(self, bytes):
+        with BytesIO(bytes) as fo:
+            grec = schemaless_reader(fo, self.parsed_schema)
+            return Record.read_generic_record(grec, self.schema)
 # NAME_TO_GEOMETRY_TYPES = {
 #     'POINT': POINT, 'MULTI_POINT': MULTI_POINT,
 #     'LINESTRING': LINESTRING, 'MULTI_LINESTRING': MULTI_LINESTRING,

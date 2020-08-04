@@ -8,7 +8,12 @@ parser.add_argument('camera_id', help='camera id to capture')
 parser.add_argument('video_file', help='target video file path')
 parser.add_argument('--loop', '-l', action='store_true', help='re-start to play at the end of the play')
 parser.add_argument('--show', '-s', action='store_true', help='number of frames per second')
+parser.add_argument('--topic', '-t', type=str, default='dric/camera_frames', help='target topic name')
 args = parser.parse_args()
+
+dric.connect()
+topic = dric.get_dataset("/topics/" + args.topic)
+dric.disconnect()
 
 from collections import namedtuple
 class Resolution(namedtuple('Resolution', 'width height')):
@@ -39,7 +44,7 @@ class VideoPlayer:
         if ret:
             pos = self.vcap.get(cv2.CAP_PROP_POS_MSEC)
             ts = time.time()
-            idle_ts = (pos - self.pos) - (ts - self.ts)
+            idle_ts = (pos - self.pos) - (ts - self.ts) - 10
             self.pos = pos
             self.ts = ts
             if idle_ts > 1:
@@ -79,18 +84,20 @@ class VideoPlayer:
 
 
 class BBoxObjectTracker:
-    def __init__(self): pass
+    def __init__(self, camera_id):
+        self.camera_id = camera_id
 
     def on_capture_started(self, player):
         pass
 
-    def on_captured(self, player, frame, ts):
-        pass
+    def on_captured(self, player, image, ts):
+        frame = dric.CameraFrame(self.camera_id, image, ts)
+        bytes = frame.to_bytes()
 
     def on_capture_stopped(self, player):
         pass
 
 dric.set_log_level(logging.DEBUG)
 platform = dric.connect()
-VideoPlayer.play(args.camera_id, args.video_file, BBoxObjectTracker(), args.show)
+VideoPlayer.play(args.camera_id, args.video_file, BBoxObjectTracker(args.camera_id), args.show)
 dric.disconnect()

@@ -37,6 +37,22 @@ def data_server():
 def get_dataset(ds_id):
     return data_server().get_dataset(ds_id)
 
+class TopicNotFound(Exception):
+    def __init__(self, name):
+        self.topic_name = name
+
+from .dric_types import CameraFrame, ObjectBBoxTrack
+__builtin_topic_infos = {"dric/camera_frames": CameraFrame,
+                        "dric/bbox_tracks": ObjectBBoxTrack }
+from .mqtt import MqttTopic
+def get_topic(topic, msg_handler=None):
+    if not msg_handler:
+        msg_handler = __builtin_topic_infos[topic]
+        if not msg_handler:
+            raise TopicNotFound(topic)
+    topic_server = __get_platform().get_service_end_point('topic_server')
+    return MqttTopic(topic_server.host, topic_server.port, topic, msg_handler)
+
 import logging
 _logger = logging.getLogger("dric")
 _logger.setLevel(logging.WARN)
