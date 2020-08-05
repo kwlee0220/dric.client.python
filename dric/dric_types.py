@@ -9,6 +9,10 @@ class AvroSerializable:
         grec = schemaless_reader(fo, cls.PARSED_AVRO_SCHEMA)
         return Record.read_generic_record(grec, cls.SCHEMA)
 
+    def to_bytes(self):
+        pass
+        
+
 class CameraFrame(AvroSerializable):
     SCHEMA = RecordSchemaBuilder()   \
                     .add('camera_id', STRING)   \
@@ -21,14 +25,17 @@ class CameraFrame(AvroSerializable):
         from .utils import to_bstring_from_mat
         bstr = to_bstring_from_mat(image)
         epoch = int(round(ts * 1000))
-        self.values = [camera_id, bstr, epoch]
+        self.record = Record(CameraFrame.SCHEMA, (camera_id, bstr, epoch))
+
+    def to_generic_record(self):
+        grec = dict(self.record)
+        return grec
 
     def to_bytes(self):
-        fo = BytesIO()
-        schemaless_writer(fo, CameraFrame.PARSED_AVRO_SCHEMA, self.values)
-        fo.flush()
-        fo.close()
-        return fo.getvalue()
+        with BytesIO() as fo:
+            schemaless_writer(fo, CameraFrame.PARSED_AVRO_SCHEMA, self.to_generic_record())
+            fo.flush()
+            return fo.getvalue()
 
     def __str__(self):
         return '{0}[id={1}, image.size={2}, ts={3}'.format(type(self).__name__, self.camera_id,

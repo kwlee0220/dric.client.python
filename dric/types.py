@@ -196,20 +196,25 @@ class Columns:
 
 class RecordSchema:
     def __init__(self, columns):
-        self.columns = Columns(columns)
+        self.columns = columns
         self.display_name = self.__to_type_name()
 
-    def __getattr__(self, name):
-        if name == 'avro_schema':
-            return self.__to_avro_schema()
-        else:
-            raise ValueError("unknown attribute: " + name)
+        from fastavro import parse_schema
+        self.avro_schema = __to_avro_schema(columns.values())
+        self.parsed_schema = parse_schema(self.avro_schema)
+
+    @property
+    def avro_schema(self):
+        return self.__to_avro_schema()
+    @property
+    def parsed_avro_schema(self):
+        return self.__to_avro_schema()
         
     def __str__(self):
         return self.display_name
         
     def __to_type_name(self):
-        return '{' + ','.join(['%s:%s'% col[0:2] for col in self.columns]) + '}'
+        return '{' + ','.join(['%s:%s'% c[0:2] for c in self.columns.values()]) + '}'
 
     @staticmethod
     def from_type_id(type_id):
@@ -222,8 +227,9 @@ class RecordSchema:
             builder.add(parts[0], type)
         return builder.build()
 
-    def __to_avro_schema(self):
-        cols_spec = [self.__to_avro_column(col) for col in self.columns]
+    @staticmethod
+    def __to_avro_schema(columns):
+        cols_spec = [__to_avro_column(col) for col in columns]
         avro_schema = { 
             'name': 'simple_feature',
             'namespace': 'etri.marmot',
@@ -231,7 +237,8 @@ class RecordSchema:
             'fields': cols_spec
         }
         return avro_schema
-    def __to_avro_column(self, col):
+    @staticmethod
+    def __to_avro_column(col):
         col_spec = AVRO_COLUMNS[col.type.tc]
         return { 'name': col.name, 'type': col_spec }
 
@@ -256,7 +263,35 @@ class Record:
         if values:
             self.values = values
         else:
-            self.values = tuple(None for col in schema.columns)
+            self.values = tuple(None for col in schema.columns.values())
+
+    def to_bytes(self):
+        with BytesIO() as fo:
+            schemaless_writer(fo, self.schema, to_dict())
+            fo.flush()
+            return fo.getvalue()
+            
+    @classmethod
+    def from_bytes(cls, bytes):
+        with BytesIO(bytes) as fo:
+            grec = schemaless_reader(fo, cls.PARSED_AVRO_SCHEMA)
+            return Record.from_dict(grec, cls.SCHEMA)
+
+    def to_dict(self):
+        return { col.name: self.values[col.ordinal] for col in self.schema.columns.values() }
+
+    @classmethod
+    def from_dict(cls, dict, schema):
+        values = tuple(Record.__parse_avro_value(dict, col) for col in schema.columns.values())
+        return cls(schema, values)
+
+    @staticmethod
+    def __parse_avro_value(dict, col):
+        avro_value = dict.get(col.name)
+        if avro_value is not None:
+            return parse_avro_value(avro_value, col.type)
+        else:
+            return None
 
     def __len__(self):
         return len(self.values)
@@ -266,28 +301,23 @@ class Record:
 
     def __getitem__(self, idx):
         col = self.schema.columns[idx]
-        if type(col) == Column:
+        if isinstance(col, Column):
             return self.values[col.ordinal]
         elif type(col) == list:
             return tuple(self.values[c.ordinal] for c in col)
 
     def __getattr__(self, name):
-        col = self.schema.columns[name]
-        return self.values[col.ordinal]
+        ret = getattr(self.schema.columns, name)
+        if isinstance(ret, Column):
+            return self.values[ret.ordinal]
+        else:
+            return ret
         
     def __repr__(self):
         return '(' + ', '.join(['%s:%s' % (col[0], self[col[2]]) for col in self.schema.columns]) + ')'
         
     def __str__(self):
         return '(' + ', '.join(['%s' % (self.values[col[2]]) for col in self.schema.columns]) + ')'
-
-    def to_generic_record():
-        return [write_avro_value(grec[col.name], col.type) for col in schema.columns]
-
-    @staticmethod
-    def read_generic_record(grec, schema):
-        values = [parse_avro_value(grec[col.name], col.type) for col in schema.columns]
-        return Record(schema, values)
 
 def write_avro_value(value, type):
     if type.isPrimitiveType:

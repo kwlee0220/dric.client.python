@@ -71,29 +71,52 @@ class RecordStream:
             return tuple(from_value_proto(values[col.ordinal]) for col in schema.columns)
 
 from io import BytesIO
+import paho.mqtt.client as mqtt
 from fastavro import parse_schema, schemaless_reader, schemaless_writer
 class MqttDataSet(DataSet):
     def __init__(self, stub, ds_info):
         super().__init__(stub, ds_info)
+
+        parts = self.parameter.split(":")
+        self.broker_host = parts[0]
+        self.broker_port = int(parts[1])
+        self.topic = parts[2]
         self.parsed_schema = parse_schema(self.schema.avro_schema)
 
     def read(self):
-        parts = self.parameter.split(":")
-        return TopicRecordStream(self.schema, parts[0], int(parts[1]), parts[2])
+        return TopicRecordStream(self.schema, self.parsed_schema, self.broker_host, self.broker_port, self.topic)
 
-    def write(self, strm):
-        parts = self.parameter.split(":")
-        import paho.mqtt.client as mqtt
+    def open_writer(self):
         mqtt_client = mqtt.Client()
-        mqtt_client.connect(parts[0], int(parts[1]))
-        for rec in strm:
-            fo = BytesIO()
-            schemaless_writer.write(fo, self.parsed_schema, rec)
+        mqtt_client.connect(self.broker_host, self.broker_port)
+        return MqttRecordStreamWriter(mqtt_client, self.topic, self.parsed_schema)
+
+class MqttRecordStreamWriter:
+    def __init__(self, mqtt, topic, parsed_schema):
+        self.parsed_schema = parsed_schema
+        self.mqtt = mqtt
+        self.topic = topic
+        self.qos = 0
+        self.retain = 0
+        self.count = 0
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, exc_tb):
+        return False
+
+    def write(self, record):
+        with BytesIO() as fo:
+            schemaless_writer(fo, self.parsed_schema, record.to_dict())
+            self.count += 1
+            fo.flush()
+            self.mqtt.publish(self.topic, fo.getvalue(), self.qos, self.retain)
 
 class TopicRecordStream:
-    def __init__(self, schema, broker_host, broker_port, topic_name):
+    def __init__(self, schema, parsed_schema, broker_host, broker_port, topic_name):
         self.schema = schema
-        self.parsed_schema = parse_schema(schema.avro_schema)
+        self.parsed_schema = parsed_schema
 
         import threading, queue
         self.cv = threading.Condition()
@@ -116,7 +139,9 @@ class TopicRecordStream:
             while 1:
                 if self.msg_queue.qsize() > 0:
                     rec_bytes = self.msg_queue.get()
-                    return self.__parse_bytes(rec_bytes)
+                    with BytesIO(rec_bytes) as fo:
+                        grec = schemaless_reader(fo, self.parsed_schema)
+                        return Record.read_generic_record(grec, self.schema)
                 else:
                     self.cv.wait()
 
@@ -128,10 +153,6 @@ class TopicRecordStream:
             else:
                 print("lost message!!!!!")
 
-    def __parse_bytes(self, bytes):
-        with BytesIO(bytes) as fo:
-            grec = schemaless_reader(fo, self.parsed_schema)
-            return Record.read_generic_record(grec, self.schema)
 # NAME_TO_GEOMETRY_TYPES = {
 #     'POINT': POINT, 'MULTI_POINT': MULTI_POINT,
 #     'LINESTRING': LINESTRING, 'MULTI_LINESTRING': MULTI_LINESTRING,

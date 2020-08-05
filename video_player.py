@@ -11,10 +11,6 @@ parser.add_argument('--show', '-s', action='store_true', help='number of frames 
 parser.add_argument('--topic', '-t', type=str, default='dric/camera_frames', help='target topic name')
 args = parser.parse_args()
 
-dric.connect()
-topic = dric.get_dataset("/topics/" + args.topic)
-dric.disconnect()
-
 from collections import namedtuple
 class Resolution(namedtuple('Resolution', 'width height')):
     def __repr__(self):
@@ -68,7 +64,7 @@ class VideoPlayer:
                 if frame is None: break
 
                 import time
-                ts = time.time()
+                ts = int(round(time.time() * 1000))
                 if cls.logger.isEnabledFor(logging.DEBUG):
                     cls.logger.info('capture a frame from {0}, ts={1}'.format(player, ts))
 
@@ -84,20 +80,26 @@ class VideoPlayer:
 
 
 class BBoxObjectTracker:
-    def __init__(self, camera_id):
+    def __init__(self, camera_id, schema):
         self.camera_id = camera_id
+        self.schema = schema
 
     def on_capture_started(self, player):
-        pass
+        self.writer = topic.open_writer()
+        self.writer.__enter__()
 
     def on_captured(self, player, image, ts):
-        frame = dric.CameraFrame(self.camera_id, image, ts)
-        bytes = frame.to_bytes()
+        bstr = dric.to_bstring_from_mat(image)
+        self.writer.write(dric.Record(self.schema, (self.camera_id, bstr, ts)))
 
     def on_capture_stopped(self, player):
-        pass
+        self.writer.__exit__(None, None, None)
 
+dric.connect()
+
+topic = dric.get_dataset("/topics/" + args.topic)
 dric.set_log_level(logging.DEBUG)
-platform = dric.connect()
-VideoPlayer.play(args.camera_id, args.video_file, BBoxObjectTracker(args.camera_id), args.show)
+track = BBoxObjectTracker(args.camera_id, topic.record_schema)
+VideoPlayer.play(args.camera_id, args.video_file, track, args.show)
+
 dric.disconnect()
