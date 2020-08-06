@@ -1,9 +1,9 @@
 import cv2
 import dric.pb2 as pb2
 from . import proto_utils
+import logging
 
 class DrICVideoServer:
-    import logging
     __logger = logging.getLogger("dric.video")
     __logger.setLevel(logging.WARN)
     __logger.addHandler(logging.StreamHandler())

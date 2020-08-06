@@ -1,8 +1,8 @@
 import logging
 import dric
-import cv2
-        
+import cv2       
 import time
+
 class VideoPlayer:
     logger = logging.getLogger("dric.video")
 
@@ -61,8 +61,7 @@ class VideoPlayer:
 
 
 class BBoxObjectTracker:
-    def __init__(self, camera_id, schema):
-        self.camera_id = camera_id
+    def __init__(self, schema):
         self.schema = schema
 
     def on_capture_started(self, player):
@@ -71,7 +70,8 @@ class BBoxObjectTracker:
 
     def on_captured(self, player, image, ts):
         bstr = dric.to_bstring_from_mat(image)
-        self.writer.write(dric.Record(self.schema, (self.camera_id, bstr, ts)))
+        rec = dric.Record(self.schema, (player.id, bstr, ts))
+        self.writer.write(rec)
 
     def on_capture_stopped(self, player):
         self.writer.__exit__(None, None, None)
@@ -91,7 +91,7 @@ if __name__ == "__main__":
 
     topic = dric.get_dataset("/topics/" + args.topic)
     dric.set_log_level(logging.DEBUG)
-    track = BBoxObjectTracker(args.camera_id, topic.record_schema)
+    track = BBoxObjectTracker(topic.record_schema)
     VideoPlayer.play(args.camera_id, args.video_file, track, args.show)
 
     dric.disconnect()

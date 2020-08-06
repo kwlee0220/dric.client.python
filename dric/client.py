@@ -31,6 +31,12 @@ def __get_platform():
     else:
         raise NotConnected("dric_platform")
 
+def video_server():
+    return __get_platform().video_server
+
+def get_camera(id):
+    return video_server().get_camera(id)
+
 def data_server():
     return __get_platform().marmot_runtime.data_server
 

@@ -144,7 +144,6 @@ IDX_TO_TYPES = [
     MULTI_POLYGON, GEOM_COLLECTION, GEOMETRY
 ]
 
-from collections import namedtuple
 Coordinate = namedtuple("Coordinate", 'x y')
 Envelope = namedtuple("Envelope", 'tl br')
 
@@ -275,8 +274,8 @@ class Record:
         ret = self.schema.columns.get(name)
         if ret is not None:
             return self.values[ret.ordinal]
-        elif type(ret) == list:
-            return tuple(self.values[c.ordinal] for c in col)
+        # elif type(ret) == list:
+        #     return tuple(self.values[c.ordinal] for c in ret)
         else:
             raise ColumnNotFound(name)
         
