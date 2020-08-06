@@ -1,5 +1,6 @@
 import logging
 import cv2
+import time
 
 logger = logging.getLogger("dric.video")
 
@@ -12,17 +13,23 @@ from abc import ABC, abstractmethod
 class ImageSource(ABC):
     def __init__(self, id, size):
         self.id = id
-        self.size = size
+        self.size = size        # Resolution
 
     @abstractmethod
-    def capture(self): pass
+    @property
+    def fps(self): pass
 
-class Camera(ImageSource):
+    @abstractmethod
+    def capture(self): pass     # (sleep_millis, frame)
+
+    def __str__(self):
+        return '{0}[{1},{2}]'.format(type(self).__name__, self.id, str(self.size))
+
+class VideoCaptureSource(ImageSource):
     def __init__(self, id, vcap):
-        self._id = id
+        super().__init__(id, Resolution(int(vcap.get(cv2.CAP_PROP_FRAME_WIDTH)),
+                                        int(vcap.get(cv2.CAP_PROP_FRAME_HEIGHT))))
         self.vcap = vcap
-        self._size = Resolution(int(self.vcap.get(cv2.CAP_PROP_FRAME_WIDTH)),
-                                int(self.vcap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
 
     def __enter__(self):
         return self
@@ -32,56 +39,45 @@ class Camera(ImageSource):
     def release(self):
         self.vcap.release()
 
-    @property
-    def id(self):
-        return self._id
+class Camera(VideoCaptureSource):
+    def __init__(self, id, vcap, fps):
+        super().__init__(id, vcap)
+        self._fps = fps
+        self.interval = 1.0 / fps
 
     @property
-    def size(self):
-        return self._size
+    def fps(self):
+        return self._fps
 
     def capture(self):
+        started = time.time()
         ret, frame = self.vcap.read()
         if ret:
-            return frame
+            sleep_millis = int(round((self.interval - (time.time() - started)) * 1000))
+            return (sleep_millis,  frame)
         else:
-            return ret
+            return (0, None)
 
-    def __str__(self):
-        return '{0}[{1},{2}]'.format(type(self).__name__, self.id, str(self.size))
-
-class VideoPlayer(ImageSource):
+class VideoPlayer(VideoCaptureSource):
     def __init__(self, id, file):
-        self._id = id
+        vcap = cv2.VideoCapture(file)
+        super().__init__(id, vcap)
         self.file = file
-        self.vcap = cv2.VideoCapture(file)
-        self.pos = self.vcap.get(cv2.CAP_PROP_POS_MSEC)
-        self.ts = time.time()
+        self._fps = vcap.get(cv2.CAP_PROP_FPS)
+        self.last_pos = 0
 
     @property
-    def id(self):
-        return self._id
+    def fps(self):
+        return self._fps
 
-    @property
-    def size(self):
-        return self._size
-        self._size = Resolution(int(self.vcap.get(cv2.CAP_PROP_FRAME_WIDTH)),
-                                int(self.vcap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
-
-    def release(self):
-        self.vcap.release()
-
-    def read(self):
+    def capture(self):
+        started = time.time()
         ret, frame = self.vcap.read()
         if ret:
+            elapsed = (time.time()-started) * 1000
             pos = self.vcap.get(cv2.CAP_PROP_POS_MSEC)
-            ts = time.time()
-            idle_ts = int((pos - self.pos) - (ts - self.ts) - 10)
-            self.pos = pos
-            self.ts = ts
-            if idle_ts > 5:
-                if cv2.waitKey(idle_ts) & 0xFF == ord('q'):
-                    return None
-            return frame
+            sleep_millis = int(round(pos - self.last_pos - elapsed))
+            self.last_pos = pos
+            return (sleep_millis, frame)
         else:
-            return None
+            return (0, None)

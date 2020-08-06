@@ -100,9 +100,11 @@ class MqttRecordStreamWriter:
         self.retain = 0
         self.count = 0
 
+    def close(self):
+        self.mqtt;
+
     def __enter__(self):
         return self
-
     def __exit__(self, exc_type, exc_value, exc_tb):
         return False
 

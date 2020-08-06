@@ -34,8 +34,10 @@ def __get_platform():
 def video_server():
     return __get_platform().video_server
 
-def get_camera(id):
-    return video_server().get_camera(id)
+def get_camera(id, fps):
+    vcap = video_server().get_camera(id)
+    from .camera import Camera
+    return Camera(id, vcap, fps)
 
 def data_server():
     return __get_platform().marmot_runtime.data_server

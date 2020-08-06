@@ -64,7 +64,7 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('camera_id', help='camera id to capture')
-    parser.add_argument('video_output', help='directory for the generated video files')
+    parser.add_argument('video_output', required=False, help='directory for the generated video files')
     parser.add_argument('--fps', type=float, default=10.0, help='number of frames per second')
     parser.add_argument('--video_interval', '-i', type=int, default=60*10, help='interval for a video in seconds')
     parser.add_argument('--show', '-s', action='store_true', help='number of frames per second')

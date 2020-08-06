@@ -1,7 +1,8 @@
-import cv2
-import dric.pb2 as pb2
+import grpc
+from . import pb2
 from . import proto_utils
 import logging
+import cv2
 
 class DrICVideoServer:
     __logger = logging.getLogger("dric.video")
@@ -14,15 +15,15 @@ class DrICVideoServer:
     def with_stub(self, action):
         type(self).__logger.debug('connecting DrICVideoServer({0})'.format(self.target))
         with grpc.insecure_channel(self.target) as channel:
-            stub = pb2.dric.DrICVideoServerStub(channel)
+            stub = pb2.dric_grpc.DrICVideoServerStub(channel)
             return action(stub)
 
     def get_camera(self, camera_id):
         id_proto = pb2.type.StringProto(value=camera_id)
         resp = self.with_stub(lambda stub: stub.getCamera(id_proto))
-        camera = proto_utils.handle_response(resp, 'camera')
-        type(self).__logger.debug('fetch camera: {0}'.format(camera.rtsp_url))
-        return cv2.VideoCapture(camera.rtsp_url)
+        camera_info = proto_utils.handle_response(resp, 'camera_info')
+        type(self).__logger.debug('fetch camera: {0}'.format(camera_info.rtsp_url))
+        return cv2.VideoCapture(camera_info.rtsp_url)
     
     @classmethod
     def set_log_level(cls, level):

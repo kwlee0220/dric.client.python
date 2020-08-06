@@ -11,8 +11,8 @@
             "program": "${file}",
             "args": [
                 "cam_00",
-                "C:/Temp/cam_1.mp4",
-                "-s"
+                "--file", "C:/Temp/cam_1.mp4",
+                "-l", "-s"
             ],
             "console": "integratedTerminal"
         },
@@ -22,9 +22,7 @@
             "request": "launch",
             "program": "${file}",
             "args": [
-                "cam_00",
-                "C:/Temp/cam_1.mp4",
-                "-s"
+                "cam_00", "-l", "-s"
             ],
             "console": "integratedTerminal"
         }
