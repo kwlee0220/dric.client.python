@@ -85,7 +85,7 @@ class GeometryDataType(DataType):
     def __encode_type_name(tc, srid):
         if srid is None:
             srid = '?'
-        elif ( srid.startswith('EPSG:') ):
+        elif srid.startswith('EPSG:'):
             srid = srid[5:]
         return '{0}({1})'.format(tc.name, srid)
 
@@ -173,27 +173,6 @@ AVRO_COLUMNS = {
 }
 
 Column = namedtuple("Column", 'name type ordinal')
-class Columns:
-    def __init__(self, columns):
-        self.column_map = columns
-        self.columns = list(columns.values())
-
-    def __len__(self):
-        return len(self.columns)
-
-    def __iter__(self):
-        # return (col for col in self.columns)
-        return iter(self.columns)
-
-    def __getitem__(self, idx):
-        if type(idx) == str:
-            return self.column_map[idx]
-        else:
-            return self.columns[idx]
-
-    def __getattr__(self, name):
-        return self.column_map[name]
-
 class RecordSchema:
     def __init__(self, columns):
         self.columns = columns
@@ -203,7 +182,9 @@ class RecordSchema:
     @property
     def avro_schema(self):
         if self._avro_schema is None:
-            cols_spec = [{ 'name': col.name, 'type': AVRO_COLUMNS[col.type.tc] } for col in self.columns.values()]
+            cols_spec = [{ 'name': col.name,
+                            'type': AVRO_COLUMNS[col.type.tc] }
+                            for col in self.columns.values()]
             self._avro_schema = { 
                 'name': 'simple_feature',
                 'namespace': 'etri.marmot',
@@ -211,21 +192,6 @@ class RecordSchema:
                 'fields': cols_spec
             }
         return self._avro_schema
-
-    @staticmethod
-    def __to_avro_column(col):
-        col_spec = AVRO_COLUMNS[col.type.tc]
-        return { 'name': col.name, 'type': col_spec }
-
-    def __mk_avro_schema(columns):
-        cols_spec = [RecordSchema.__to_avro_column(col) for col in columns]
-        avro_schema = { 
-            'name': 'simple_feature',
-            'namespace': 'etri.marmot',
-            'type': 'record',
-            'fields': cols_spec
-        }
-        return avro_schema
 
     @property
     def parsed_avro_schema(self):
@@ -257,21 +223,6 @@ class RecordSchema:
         with BytesIO(bytes) as fo:
             grec = schemaless_reader(fo, self.parsed_avro_schema)
             return self.load_record_from_dict(grec)
-
-    @staticmethod
-    def __mk_avro_schema(columns):
-        cols_spec = [RecordSchema.__to_avro_column(col) for col in columns]
-        avro_schema = { 
-            'name': 'simple_feature',
-            'namespace': 'etri.marmot',
-            'type': 'record',
-            'fields': cols_spec
-        }
-        return avro_schema
-    @staticmethod
-    def __to_avro_column(col):
-        col_spec = AVRO_COLUMNS[col.type.tc]
-        return { 'name': col.name, 'type': col_spec }
         
     def __str__(self):
         return self.type_name
@@ -298,6 +249,9 @@ class Record:
     def __init__(self, schema, values=None):
         self.schema = schema
         if values:
+            if len(schema.columns) != len(values):
+                raise ValueError('invalid record column values: schema({0}) != values({1})'.format(
+                                    len(schema.columns), len(values)))
             self.values = values
         else:
             self.values = tuple(None for col in schema.columns.values())

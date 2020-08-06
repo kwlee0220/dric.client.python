@@ -5,11 +5,27 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "VideoPlayer",
             "type": "python",
             "request": "launch",
             "program": "${file}",
-            "args": ["cam_00", "C:/Temp/cam_1.mp4", "-s"],
+            "args": [
+                "cam_00",
+                "C:/Temp/cam_1.mp4",
+                "-s"
+            ],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "CameraAgent",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "args": [
+                "cam_00",
+                "C:/Temp/cam_1.mp4",
+                "-s"
+            ],
             "console": "integratedTerminal"
         }
     ]

@@ -1,20 +1,6 @@
 import logging
 import dric
 import cv2
-
-import argparse
-parser = argparse.ArgumentParser()
-parser.add_argument('camera_id', help='camera id to capture')
-parser.add_argument('video_file', help='target video file path')
-parser.add_argument('--loop', '-l', action='store_true', help='re-start to play at the end of the play')
-parser.add_argument('--show', '-s', action='store_true', help='number of frames per second')
-parser.add_argument('--topic', '-t', type=str, default='dric/camera_frames', help='target topic name')
-args = parser.parse_args()
-
-from collections import namedtuple
-class Resolution(namedtuple('Resolution', 'width height')):
-    def __repr__(self):
-        return '%d x %d' % self
         
 import time
 class VideoPlayer:
@@ -30,21 +16,16 @@ class VideoPlayer:
     def release(self):
         self.vcap.release()
 
-    @property
-    def size(self):
-        return Resolution(int(self.vcap.get(cv2.CAP_PROP_FRAME_WIDTH)),
-                            int(self.vcap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
-
     def read(self):
         ret, frame = self.vcap.read()
         if ret:
             pos = self.vcap.get(cv2.CAP_PROP_POS_MSEC)
             ts = time.time()
-            idle_ts = (pos - self.pos) - (ts - self.ts) - 10
+            idle_ts = int((pos - self.pos) - (ts - self.ts) - 10)
             self.pos = pos
             self.ts = ts
-            if idle_ts > 1:
-                if cv2.waitKey(int(idle_ts)) & 0xFF == ord('q'):
+            if idle_ts > 5:
+                if cv2.waitKey(idle_ts) & 0xFF == ord('q'):
                     return None
             return frame
         else:
@@ -95,11 +76,22 @@ class BBoxObjectTracker:
     def on_capture_stopped(self, player):
         self.writer.__exit__(None, None, None)
 
-dric.connect()
 
-topic = dric.get_dataset("/topics/" + args.topic)
-dric.set_log_level(logging.DEBUG)
-track = BBoxObjectTracker(args.camera_id, topic.record_schema)
-VideoPlayer.play(args.camera_id, args.video_file, track, args.show)
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('camera_id', help='camera id to capture')
+    parser.add_argument('video_file', help='target video file path')
+    parser.add_argument('--loop', '-l', action='store_true', help='re-start to play at the end of the play')
+    parser.add_argument('--show', '-s', action='store_true', help='number of frames per second')
+    parser.add_argument('--topic', '-t', type=str, default='dric/camera_frames', help='target topic name')
+    args = parser.parse_args()
 
-dric.disconnect()
+    dric.connect()
+
+    topic = dric.get_dataset("/topics/" + args.topic)
+    dric.set_log_level(logging.DEBUG)
+    track = BBoxObjectTracker(args.camera_id, topic.record_schema)
+    VideoPlayer.play(args.camera_id, args.video_file, track, args.show)
+
+    dric.disconnect()
