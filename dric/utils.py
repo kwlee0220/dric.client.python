@@ -13,3 +13,19 @@ def from_bstring_to_mat(bstr):
 def to_bstring_from_mat(mat):
     bstr = mat.tobytes()
     return bstr
+
+def parse_duration(str):
+    if str.endswith('ms'):
+        return int(str[0:-2])
+    elif str.endswith('s'):
+        return int(str[0:-1]) * 1000
+    elif str.endswith('m'):
+        return int(str[0:-1]) * 1000 * 60
+    elif str.endswith('h'):
+        return int(str[0:-1]) * 1000 * 60 * 60
+    elif str.endswith('d'):
+        return int(str[0:-1]) * 1000 * 60 * 60 * 24
+    elif str.endswith('w'):
+        return int(str[0:-1]) * 1000 * 60 * 60 * 24 * 7
+    else:
+        return int(str)

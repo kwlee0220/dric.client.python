@@ -14,12 +14,13 @@ class BBoxObjectTracker:
         self.ds_writer.__enter__()
 
     def on_captured(self, camera, image, ts):
-        if not self.video_writer:
-            self.video_writer = self.__open_video_writer(camera, ts)
-        elif (ts - self.start_ts) >= self.interval:
-            self.video_writer.release()
-            self.video_writer = self.__open_video_writer(camera, ts)
-        self.video_writer.write(image)
+        if self.output_dir is not None:
+            if not self.video_writer:
+                self.video_writer = self.__open_video_writer(camera, ts)
+            elif (ts - self.start_ts) >= self.interval:
+                self.video_writer.release()
+                self.video_writer = self.__open_video_writer(camera, ts)
+            self.video_writer.write(image)
 
         bstr = dric.to_bstring_from_mat(image)
         rec = dric.Record(self.ds.record_schema, (camera.id, bstr, ts))
@@ -30,14 +31,16 @@ class BBoxObjectTracker:
             self.video_writer.release()
             self.video_writer = None
         self.ds_writer.close()
-
         self.ds_writer.__exit__(None, None, None)
 
     def __open_video_writer(self, camera, ts):
         self.start_ts = ts
-        import os.path
-        video_file = os.path.join(self.output_dir, '%s_%s.avi' % (camera.id, int(self.start_ts)))
-        return cv2.VideoWriter(video_file, cv2.VideoWriter_fourcc(*"DIVX"), camera.fps, camera.size)
+
+        from pathlib import Path
+        video_dir_path = Path(self.output_dir)
+        video_path = video_dir_path / '{0}_{1}.avi'.format(camera.id, int(self.start_ts))
+        video_path.parent.mkdir(parents=True, exist_ok=True)
+        return cv2.VideoWriter(str(video_path), cv2.VideoWriter_fourcc(*"DIVX"), camera.fps, camera.size)
 
 def run(capture_fact, tracker, loop, show_image):
     try:
@@ -69,6 +72,7 @@ if __name__ == "__main__":
     parser.add_argument('camera_id', help='camera id to capture')
     parser.add_argument('--output_dir', '-o', type=str, required=False, help='directory for created video files')
     parser.add_argument('--video_file', '-f', type=str, help='video file path')
+    parser.add_argument('--video_interval', '-i', type=str, default="1h", help='interval for a video in seconds')
     parser.add_argument('--fps', type=float, default=10.0, help='number of frames per second')
     parser.add_argument('--loop', '-l', action='store_true', help='re-start to play at the end of the play')
     parser.add_argument('--show', '-s', action='store_true', help='number of frames per second')
@@ -76,11 +80,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     dric.connect()
-    topic = dric.get_dataset('topics/{0}'.format(args.topic))
-    tracker = BBoxObjectTracker(topic, args.output_dir)
-
     try :
-        if args.file:
+        topic = dric.get_dataset('topics/{0}'.format(args.topic))
+        tracker = BBoxObjectTracker(topic, args.output_dir, dric.parse_duration(args.video_interval))
+
+        if args.video_file:
             def create_video_player():
                 return dric.VideoPlayer(args.camera_id, args.video_file)
             capture_fact = create_video_player

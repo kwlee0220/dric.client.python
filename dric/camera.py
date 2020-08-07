@@ -1,6 +1,7 @@
 import logging
 import cv2
 import time
+from .utils import current_millis
 
 logger = logging.getLogger("dric.video")
 
@@ -15,8 +16,8 @@ class ImageSource(ABC):
         self.id = id
         self.size = size        # Resolution
 
-    @abstractmethod
     @property
+    @abstractmethod
     def fps(self): pass
 
     @abstractmethod
@@ -50,10 +51,10 @@ class Camera(VideoCaptureSource):
         return self._fps
 
     def capture(self):
-        started = time.time()
+        started = current_millis()
         ret, frame = self.vcap.read()
         if ret:
-            sleep_millis = int(round((self.interval - (time.time() - started)) * 1000))
+            sleep_millis = self.interval - current_millis()
             return (sleep_millis,  frame)
         else:
             return (0, None)
@@ -71,10 +72,10 @@ class VideoPlayer(VideoCaptureSource):
         return self._fps
 
     def capture(self):
-        started = time.time()
+        started = current_millis()
         ret, frame = self.vcap.read()
         if ret:
-            elapsed = (time.time()-started) * 1000
+            elapsed = current_millis() - started
             pos = self.vcap.get(cv2.CAP_PROP_POS_MSEC)
             sleep_millis = int(round(pos - self.last_pos - elapsed))
             self.last_pos = pos

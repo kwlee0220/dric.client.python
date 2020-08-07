@@ -10,9 +10,11 @@
             "request": "launch",
             "program": "${file}",
             "args": [
-                "cam_00",
-                "--file", "C:/Temp/cam_1.mp4",
-                "-l", "-s"
+                "cam_01",
+                "--video_file", "C:/Temp/cam_1.mp4",
+                "--output_dir", "C:/Temp/videos",
+                "--video_interval", "30s",
+                "--loop", "--show"
             ],
             "console": "integratedTerminal"
         },
@@ -22,7 +24,10 @@
             "request": "launch",
             "program": "${file}",
             "args": [
-                "cam_00", "-l", "-s"
+                "cam_00",
+                "--output_dir", "C:/Temp/videos",
+                "--video_interval", "30s",
+                "--loop", "--show"
             ],
             "console": "integratedTerminal"
         }
