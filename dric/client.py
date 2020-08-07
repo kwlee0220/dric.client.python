@@ -1,9 +1,5 @@
 import grpc
 import cv2
-# from .pb2 import marmot_type_pb2 as type_pb
-# from .pb2 import marmot_dataset_pb2_grpc as dataset_grpc
-# from .pb2 import dric_pb2_grpc as dric_grpc
-# from .pb2 import proto_utils
 
 __platform = None
 

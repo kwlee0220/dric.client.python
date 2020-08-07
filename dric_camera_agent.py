@@ -7,10 +7,11 @@ class BBoxObjectTracker:
         self.ds = ds
         self.output_dir = output_dir
         self.interval = interval
+        self.ds_writer = None
+        self.video_writer = None
 
     def on_capture_started(self, camera):
         self.ds_writer = self.ds.open_writer()
-        self.video_writer = None
         self.ds_writer.__enter__()
 
     def on_captured(self, camera, image, ts):
@@ -27,44 +28,62 @@ class BBoxObjectTracker:
         self.ds_writer.write(rec)
 
     def on_capture_stopped(self, camera):
-        if self.video_writer:
+        if self.video_writer is not None:
             self.video_writer.release()
             self.video_writer = None
-        self.ds_writer.close()
-        self.ds_writer.__exit__(None, None, None)
+        if self.ds_writer is not None:
+            self.ds_writer.close()
+            self.ds_writer.__exit__(None, None, None)
 
     def __open_video_writer(self, camera, ts):
         self.start_ts = ts
 
+        import time
+        dt_str = time.strftime("%Y%m%d_%H%M%S", time.localtime(ts / 1000.0))
+        fname = '{0}_{1}.avi'.format(camera.id, dt_str)
+
         from pathlib import Path
-        video_dir_path = Path(self.output_dir)
-        video_path = video_dir_path / '{0}_{1}.avi'.format(camera.id, int(self.start_ts))
+        video_path = Path(self.output_dir) / fname
         video_path.parent.mkdir(parents=True, exist_ok=True)
-        return cv2.VideoWriter(str(video_path), cv2.VideoWriter_fourcc(*"DIVX"), camera.fps, camera.size)
+        logger.info('create a video file: {0}'.format(video_path))
+        return cv2.VideoWriter(str(video_path), cv2.VideoWriter_fourcc(*"DIVX"), 30, camera.size)
+        # return cv2.VideoWriter(str(video_path), cv2.VideoWriter_fourcc(*"DIVX"), camera.fps, camera.size)
 
 def run(capture_fact, tracker, loop, show_image):
     try:
-        capturer = capture_fact()
-        tracker.on_capture_started(capturer)
+        camera = capture_fact()
 
+        size = camera.size
+        import numpy as np
+        empty_image = np.zeros((size.height, size.width, 3), np.uint8)
+        cv2.putText(empty_image, 'monitoring {0}...'.format(camera.id), (30, int(size.height/2)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1.3, (255,255,255), 2)
+
+        tracker.on_capture_started(camera)
         while ( 1 ):
-            sleep_millis, frame = capturer.capture()
+            sleep_millis, frame = camera.capture()
             if frame is not None:
                 started = dric.current_millis()
-                tracker.on_captured(capturer, frame, started)
+                tracker.on_captured(camera, frame, started)
                 if show_image:
-                    cv2.imshow(capturer.id, frame)
+                    cv2.imshow(camera.id, frame)
+                else:
+                    cv2.imshow(camera.id, empty_image)
     
                 elapsed = dric.current_millis() - started
                 sleep_millis = max(sleep_millis - elapsed - 3, 1)
-                if cv2.waitKey(sleep_millis) & 0xFF == ord('q'): break
+                code = cv2.waitKey(sleep_millis) & 0xFF
+                if code == ord('q'):
+                    break
+                elif code == ord('v'):
+                    show_image = not show_image
             elif loop:
-                capturer.release()
-                capturer = capture_fact()
+                camera.release()
+                camera = capture_fact()
             else: break
     finally:
-        tracker.on_capture_stopped(capturer)
-        capturer.release()
+        tracker.on_capture_stopped(camera)
+        camera.release()
 
 if __name__ == "__main__":
     import argparse
@@ -78,6 +97,11 @@ if __name__ == "__main__":
     parser.add_argument('--show', '-s', action='store_true', help='number of frames per second')
     parser.add_argument('--topic', '-t', type=str, default='dric/camera_frames', help='target topic name')
     args = parser.parse_args()
+
+    import logging
+    logger = logging.getLogger("dric.camera_agent")
+    logger.setLevel(logging.INFO)
+    # logger.addHandler(logging.StreamHandler())
 
     dric.connect()
     try :

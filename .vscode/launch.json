@@ -26,8 +26,7 @@
             "args": [
                 "cam_00",
                 "--output_dir", "C:/Temp/videos",
-                "--video_interval", "30s",
-                "--loop", "--show"
+                "--video_interval", "30s"
             ],
             "console": "integratedTerminal"
         }
