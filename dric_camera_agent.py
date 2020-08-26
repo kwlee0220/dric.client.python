@@ -2,7 +2,7 @@
 import dric
 import cv2
 
-from dric.image_processor import ImageProcessor, ImageDisplay, RecordWriter, run_image_process
+from dric.image_processor import ImageProcessor, ImageDisplay, RecordWriter, VideoCreater, run_image_process
 class BBoxObjectTracker(ImageProcessor):
     def __init__(self, ds):
         self.schema = ds.record_schema
@@ -30,10 +30,13 @@ if __name__ == "__main__":
     parser.add_argument('--topic', '-t', type=str, default='dric/camera_frames', help='target topic name')
     args = parser.parse_args()
 
+    def __open_camera():
+        return dric.Camera(args.camera_id, args.fps)
+
     import logging
     logger = logging.getLogger("dric.camera_agent")
     logger.setLevel(logging.INFO)
-    # logger.addHandler(logging.StreamHandler())
+    logger.addHandler(logging.StreamHandler())
 
     dric.connect()
     try :
@@ -42,9 +45,11 @@ if __name__ == "__main__":
         tracker = BBoxObjectTracker(topic)
         publisher = RecordWriter(topic)
         proc_list = [tracker, publisher]
+        if args.output_dir:
+            proc_list.append(VideoCreater(args.output_dir, args.video_interval))
         if args.show:
-            proc_list.append(ImageDisplay)
+            proc_list.append(ImageDisplay())
 
-        run_image_process(camera, proc_list)
+        run_image_process(__open_camera, proc_list)
     finally:
         dric.disconnect()

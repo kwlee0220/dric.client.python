@@ -1,7 +1,8 @@
 import logging
 import cv2
 
-def run_image_process(camera, frame_proc_list):
+def run_image_process(camera_fact, frame_proc_list):
+    camera = camera_fact()
     try:
         if type(frame_proc_list) != list:
             frame_proc_list = [frame_proc_list]
@@ -21,12 +22,19 @@ def run_image_process(camera, frame_proc_list):
 
                 elapsed = current_millis() - started
                 sleep_millis = max(sleep_millis - elapsed - 3, 1)
-                code = cv2.waitKey(sleep_millis) & 0xFF
+                print('sleep millis=', sleep_millis)
+                code = cv2.waitKey(1) & 0xFF
                 if code == ord('q'):
+                    ImageProcessor.logger.info('stop capturing')
                     break
                 elif code == ord('v') and display is not None:
                     display.show = not display.show
-            else: break
+            else:
+                ImageProcessor.logger.info('fails to capture an image, try to reconnect')
+                camera.release()
+                camera = camera_fact()
+                ImageProcessor.logger.info('reconnected')
+                
     finally:
         for proc in frame_proc_list:
             proc.on_capture_stopped(ctx)
@@ -35,6 +43,9 @@ def run_image_process(camera, frame_proc_list):
 
 from abc import ABCMeta, abstractmethod
 class ImageProcessor(metaclass=ABCMeta):
+    logger = logging.getLogger("dric.img_proc")
+    logger.setLevel(logging.INFO)
+
     @abstractmethod
     def on_capture_started(self, ctx): pass
 

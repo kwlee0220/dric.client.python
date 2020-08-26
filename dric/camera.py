@@ -13,7 +13,7 @@ class Camera:
     def __init__(self, id, fps):
         self.id = id
         self.fps = fps
-        self.interval = 1.0 / fps
+        self.interval = int(round(1000 / fps))
         from .client import video_server
         self.vcap = video_server().get_camera(id)
         self.size = Resolution(int(self.vcap.get(cv2.CAP_PROP_FRAME_WIDTH)),

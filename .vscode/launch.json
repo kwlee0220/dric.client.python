@@ -18,14 +18,28 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "CameraAgent",
+            "name": "CameraAgent_03",
             "type": "python",
             "request": "launch",
             "program": "${file}",
             "args": [
-                "cam_00",
+                "cam_03",
                 "--output_dir", "C:/Temp/videos",
-                "--video_interval", "30s"
+                "--video_interval", "30s",
+                "--show"
+            ],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "CameraAgent_04",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "args": [
+                "cam_04",
+                "--output_dir", "C:/Temp/videos",
+                "--video_interval", "30s",
+                "--show"
             ],
             "console": "integratedTerminal"
         }

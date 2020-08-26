@@ -6,9 +6,8 @@ from .proto_utils import get_either, from_value_proto, handle_pb_error#, handle_
 
 class DataSet:
     import logging
-    __logger = logging.getLogger("marmot.dataset")
-    __logger.setLevel(logging.WARN)
-    __logger.addHandler(logging.StreamHandler())
+    logger = logging.getLogger("marmot.dataset")
+    logger.setLevel(logging.INFO)
 
     def __init__(self, stub, ds_info):
         self.stub = stub
@@ -74,6 +73,9 @@ from io import BytesIO
 import paho.mqtt.client as mqtt
 from fastavro import parse_schema, schemaless_reader, schemaless_writer
 class MqttDataSet(DataSet):
+    logger = logging.getLogger("marmot.dataset.mqtt")
+    logger.setLevel(logging.INFO)
+    
     def __init__(self, stub, ds_info):
         super().__init__(stub, ds_info)
 
@@ -90,6 +92,9 @@ class MqttDataSet(DataSet):
         mqtt_client = mqtt.Client()
         mqtt_client.connect(self.broker_host, self.broker_port)
         return MqttRecordStreamWriter(mqtt_client, self.topic, self.parsed_schema)
+        
+    def __str__(self):
+        return 'MqttDataSet(%s:%d, topic=%s)' % (self.broker_host, self.broker_port, self.topic)
 
 class MqttRecordStreamWriter:
     def __init__(self, mqtt, topic, parsed_schema):
