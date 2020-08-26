@@ -23,9 +23,8 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('camera_id', help='camera id to capture')
-    parser.add_argument('--output_dir', '-o', type=str, required=False, help='directory for created video files')
-    parser.add_argument('--video_interval', '-i', type=str, default="1h", help='interval for a video in seconds')
-    parser.add_argument('--fps', type=float, default=10.0, help='number of frames per second')
+    parser.add_argument('--video_file', '-f', type=str, help='video file path')
+    parser.add_argument('--loop', '-l', action='store_true', help='re-start to play at the end of the play')
     parser.add_argument('--show', '-s', action='store_true', help='number of frames per second')
     parser.add_argument('--topic', '-t', type=str, default='dric/camera_frames', help='target topic name')
     args = parser.parse_args()
@@ -37,7 +36,8 @@ if __name__ == "__main__":
 
     dric.connect()
     try :
-        camera = dric.Camera(args.camera_id, args.fps)
+        player = dric.VideoPlayer(args.camera_id, args.video_file, args.loop)
+
         topic = dric.get_dataset('topics/{0}'.format(args.topic))
         tracker = BBoxObjectTracker(topic)
         publisher = RecordWriter(topic)
@@ -45,6 +45,6 @@ if __name__ == "__main__":
         if args.show:
             proc_list.append(ImageDisplay)
 
-        run_image_process(camera, proc_list)
+        run_image_process(player, proc_list)
     finally:
         dric.disconnect()

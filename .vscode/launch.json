@@ -12,9 +12,8 @@
             "args": [
                 "cam_01",
                 "--video_file", "C:/Temp/cam_1.mp4",
-                "--output_dir", "C:/Temp/videos",
-                "--video_interval", "30s",
-                "--loop", "--show"
+                // "--loop"
+                "--show"
             ],
             "console": "integratedTerminal"
         },
