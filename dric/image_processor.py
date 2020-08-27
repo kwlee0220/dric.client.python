@@ -3,6 +3,8 @@ import cv2
 
 def run_image_process(camera_fact, frame_proc_list):
     camera = camera_fact()
+    camera.start()
+
     try:
         if type(frame_proc_list) != list:
             frame_proc_list = [frame_proc_list]
@@ -21,9 +23,10 @@ def run_image_process(camera_fact, frame_proc_list):
                     proc.on_captured(ctx, started)
 
                 elapsed = current_millis() - started
+                if elapsed >= sleep_millis and ImageProcessor.logger.isEnabledFor(logging.INFO):
+                    ImageProcessor.logger.info('remains=%d, elapsed=%d' % (sleep_millis, elapsed))
                 sleep_millis = max(sleep_millis - elapsed - 3, 1)
-                print('sleep millis=', sleep_millis)
-                code = cv2.waitKey(1) & 0xFF
+                code = cv2.waitKey(sleep_millis) & 0xFF
                 if code == ord('q'):
                     ImageProcessor.logger.info('stop capturing')
                     break
@@ -31,14 +34,14 @@ def run_image_process(camera_fact, frame_proc_list):
                     display.show = not display.show
             else:
                 ImageProcessor.logger.info('fails to capture an image, try to reconnect')
-                camera.release()
+                camera.stop()
                 camera = camera_fact()
+                camera.start()
                 ImageProcessor.logger.info('reconnected')
-                
     finally:
         for proc in frame_proc_list:
             proc.on_capture_stopped(ctx)
-        camera.release()
+        camera.stop()
 
 
 from abc import ABCMeta, abstractmethod
@@ -106,10 +109,13 @@ class RecordWriter(ImageProcessor):
 class VideoCreater(ImageProcessor):
     logger = logging.getLogger("dric.video.creater")
 
-    def __init__(self, output_dir, interval):
+    def __init__(self, output_dir, fps, video_interval):
         self.output_dir = output_dir
+        self.fps = fps
+        self.video_interval_str = str(video_interval)
         from .utils import parse_duration
-        self.interval = parse_duration(str(interval))
+        self.video_interval = parse_duration(str(video_interval))
+        self.video_file = None
         self.video_writer = None
 
     def on_capture_started(self, ctx):
@@ -120,7 +126,7 @@ class VideoCreater(ImageProcessor):
         frame = ctx['frame']
         if self.video_writer is None:
             self.video_writer = self.__open_video_writer(camera, ts)
-        if (ts - self.start_ts) >= self.interval:
+        if (ts - self.start_ts) >= self.video_interval:
             self.video_writer.release()
             self.video_writer = self.__open_video_writer(camera, ts)
         self.video_writer.write(frame)
@@ -128,6 +134,12 @@ class VideoCreater(ImageProcessor):
     def on_capture_stopped(self, ctx):
         if self.video_writer is not None:
             self.video_writer.release()
+
+    def __str__(self):
+        if self.video_file:
+            return 'VideoWriter: file=%s, fps=%f, interval=%s' % (self.video_file, self.fps, self.video_interval_str)
+        else:
+            return 'VideoWriter: file=unknown, fps=%s, interval=%s' % (self.fps, self.video_interval_str)
 
     def __open_video_writer(self, camera, ts):
         self.start_ts = ts
@@ -137,7 +149,7 @@ class VideoCreater(ImageProcessor):
         fname = '{0}_{1}.avi'.format(camera.id, dt_str)
 
         from pathlib import Path
-        video_path = Path(self.output_dir) / fname
-        video_path.parent.mkdir(parents=True, exist_ok=True)
-        VideoCreater.logger.info('create a video file: {0}'.format(video_path))
-        return cv2.VideoWriter(str(video_path), cv2.VideoWriter_fourcc(*"DIVX"), 30, camera.size)
+        self.video_file = Path(self.output_dir) / fname
+        self.video_file.parent.mkdir(parents=True, exist_ok=True)
+        VideoCreater.logger.info('create a video file: {0}'.format(self.video_file))
+        return cv2.VideoWriter(str(self.video_file), cv2.VideoWriter_fourcc(*"DIVX"), self.fps, camera.size)

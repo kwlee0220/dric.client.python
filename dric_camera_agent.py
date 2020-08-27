@@ -40,13 +40,13 @@ if __name__ == "__main__":
 
     dric.connect()
     try :
-        camera = dric.Camera(args.camera_id, args.fps)
+        # camera = dric.Camera(args.camera_id, args.fps)
         topic = dric.get_dataset('topics/{0}'.format(args.topic))
         tracker = BBoxObjectTracker(topic)
         publisher = RecordWriter(topic)
         proc_list = [tracker, publisher]
         if args.output_dir:
-            proc_list.append(VideoCreater(args.output_dir, args.video_interval))
+            proc_list.append(VideoCreater(args.output_dir, args.fps, args.video_interval))
         if args.show:
             proc_list.append(ImageDisplay())
 
