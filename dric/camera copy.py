@@ -20,32 +20,60 @@ class Camera:
         self.id = id
         self.fps = fps
         self.interval = int(round(1000 / fps))
-        self.vcap = None
-        self.size = None
-
-    def start(self):
         from .client import video_server
-        self.vcap = video_server().get_camera(self.id)
+        self.vcap = video_server().get_camera(id)
         self.size = Resolution(int(self.vcap.get(cv2.CAP_PROP_FRAME_WIDTH)),
                                 int(self.vcap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
 
+        self.cond = threading.Condition()
+        self.state = State.CLOSED
+
+    def start(self):
+        threading.Thread(target=self.capturing_work).start()
     def stop(self):
+        with self.cond:
+            self.state = State.CLOSING
+            while self.state != State.CLOSED:
+                self.cond.wait()
         self.release()
 
     def release(self):
         self.vcap.release()
-        self.vcap = None
-        self.size = None
+
+    def capturing_work(self):
+        self.buffer = []
+        with self.cond:
+            self.state = State.OPEN
+
+        while True:
+            ret, frame = self.vcap.read()
+            with self.cond:
+                if self.state == State.CLOSING:
+                    self.state = State.CLOSED
+                    self.cond.notify_all()
+                    break
+                if not ret:
+                    frame = None
+
+                self.buffer.append((current_millis(), frame))
+                if len(self.buffer) >= 3:
+                    del self.buffer[0:1]
+                self.cond.notify_all()
 
     def capture(self):
         started = current_millis()
-        ret, frame = self.vcap.read()
-        if ret:
-            elapsed = current_millis() - started
-            sleep_millis = self.interval - elapsed
-            return (sleep_millis,  frame)
-        else:
-            return (-1, None)
+        with self.cond:
+            while True:
+                if self.state != State.OPEN:
+                    return (0, None)
+
+                if len(self.buffer) > 0:
+                    last = self.buffer[-1]
+                    elapsed = last[0] - started
+                    if elapsed >= 0:
+                        sleep_millis = self.interval - elapsed
+                        return (sleep_millis,  last[1])
+                self.cond.wait()
 
     def __str__(self):
         return '{0}[{1},{2}]'.format(type(self).__name__, self.id, str(self.size))
