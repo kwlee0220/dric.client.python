@@ -62,8 +62,23 @@ service DrICVideoServer {
 	rpc getCamera(marmot.proto.StringProto) returns (CameraInfoResponse);
 	rpc getCameraAll(marmot.proto.VoidProto) returns (stream CameraInfoResponse);
 	
-//	rpc getCameraFrame(CameraFrameRequest) returns (CameraFrameResponse);
-//	rpc queryCameraFrames(CameraFrameRangeRequest) returns (stream CameraFrameResponse);
+	rpc getPlaybackStream(PlaybackStreamRequest) returns (VideoStreamResponse);
+}
+
+message VideoStream {
+	string camera_id = 1;
+	string rtsp_url = 2;
+}
+message PlaybackStreamRequest {
+	string camera_id = 1;
+	string start_time = 2;
+	string stop_time = 3;
+}
+message VideoStreamResponse {
+	oneof either {
+		VideoStream stream_info = 1;
+		marmot.proto.ErrorProto error = 2;
+	}
 }
 
 message CameraInfo {

@@ -150,6 +150,11 @@ class DrICVideoServerStub(object):
                 request_serializer=marmot__type__pb2.VoidProto.SerializeToString,
                 response_deserializer=dric__pb2.CameraInfoResponse.FromString,
                 )
+        self.getPlaybackStream = channel.unary_unary(
+                '/dric.proto.DrICVideoServer/getPlaybackStream',
+                request_serializer=dric__pb2.PlaybackStreamRequest.SerializeToString,
+                response_deserializer=dric__pb2.VideoStreamResponse.FromString,
+                )
 
 
 class DrICVideoServerServicer(object):
@@ -183,6 +188,12 @@ class DrICVideoServerServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def getPlaybackStream(self, request, context):
+        """Missing associated documentation comment in .proto file"""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_DrICVideoServerServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -205,6 +216,11 @@ def add_DrICVideoServerServicer_to_server(servicer, server):
                     servicer.getCameraAll,
                     request_deserializer=marmot__type__pb2.VoidProto.FromString,
                     response_serializer=dric__pb2.CameraInfoResponse.SerializeToString,
+            ),
+            'getPlaybackStream': grpc.unary_unary_rpc_method_handler(
+                    servicer.getPlaybackStream,
+                    request_deserializer=dric__pb2.PlaybackStreamRequest.FromString,
+                    response_serializer=dric__pb2.VideoStreamResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -281,5 +297,21 @@ class DrICVideoServer(object):
         return grpc.experimental.unary_stream(request, target, '/dric.proto.DrICVideoServer/getCameraAll',
             marmot__type__pb2.VoidProto.SerializeToString,
             dric__pb2.CameraInfoResponse.FromString,
+            options, channel_credentials,
+            call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def getPlaybackStream(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/dric.proto.DrICVideoServer/getPlaybackStream',
+            dric__pb2.PlaybackStreamRequest.SerializeToString,
+            dric__pb2.VideoStreamResponse.FromString,
             options, channel_credentials,
             call_credentials, compression, wait_for_ready, timeout, metadata)

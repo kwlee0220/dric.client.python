@@ -5,9 +5,8 @@ import logging
 import cv2
 
 class DrICVideoServer:
-    __logger = logging.getLogger("dric.video")
-    __logger.setLevel(logging.WARN)
-    __logger.addHandler(logging.StreamHandler())
+    logger = logging.getLogger("dric.video")
+    logger.setLevel(logging.WARN)
 
     def __init__(self, host, port):
         self.target = '{host}:{port}'.format(host=host, port=port)
@@ -22,9 +21,16 @@ class DrICVideoServer:
         id_proto = pb2.type.StringProto(value=camera_id)
         resp = self.with_stub(lambda stub: stub.getCamera(id_proto))
         camera_info = proto_utils.handle_response(resp, 'camera_info')
-        type(self).__logger.debug('fetch camera: {0}'.format(camera_info.rtsp_url))
+        type(self).logger.debug('fetch camera: {0}'.format(camera_info.rtsp_url))
         return cv2.VideoCapture(camera_info.rtsp_url)
+
+    def get_playback_stream(self, camera_id, start_time, stop_time):
+        req = pb2.dric_pb2.PlaybackStreamRequest(camera_id = camera_id, start_time = start_time, stop_time = stop_time)
+        resp = self.with_stub(lambda stub: stub.getPlaybackStream(req))
+        stream_info = proto_utils.handle_response(resp, 'stream_info')
+        type(self).logger.debug('playback_stream: camera={0}, rtsp={1}'.format(camera_id, stream_info.rtsp_url))
+        return stream_info
     
     @classmethod
     def set_log_level(cls, level):
-        cls.__logger.setLevel(level)
+        cls.logger.setLevel(level)
